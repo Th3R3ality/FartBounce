@@ -41,13 +41,15 @@ val inGame: Boolean
 
 // Chat formatting
 private val clientPrefix = Text.empty()
-    .styled { it.withFormatting(Formatting.RESET) }.styled { it.withFormatting(Formatting.GRAY) }
-    .append(Text.literal("Liquid")
-        .styled { it.withColor(Formatting.WHITE) }.styled { it.withFormatting(Formatting.BOLD) })
-    .append(Text.literal("Bounce")
-        .styled { it.withColor(Formatting.BLUE) }.styled { it.withFormatting(Formatting.BOLD) })
-    .append(Text.literal(" ▸ ")
-        .styled { it.withFormatting(Formatting.RESET) }.styled { it.withColor(Formatting.DARK_GRAY) })
+    .styled { it.withFormatting(Formatting.RESET) }.styled { it.withFormatting(Formatting.WHITE) }
+    .append(Text.literal("[")
+        .styled { it.withColor(Formatting.GOLD) })
+    .append(Text.literal("Wurst")
+        .styled { it.withColor(Formatting.RED) })
+    .append(Text.literal("]")
+        .styled { it.withColor(Formatting.GOLD) })
+    .append(Text.literal(" ")
+        .styled { it.withFormatting(Formatting.RESET) }.styled { it.withColor(Formatting.WHITE) })
 
 fun dot() = regular(".")
 
