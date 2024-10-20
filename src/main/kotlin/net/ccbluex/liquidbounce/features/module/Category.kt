@@ -29,6 +29,8 @@ enum class Category(val readableName: String) {
     EXPLOIT("Exploit"),
     FUN("Fun"),
 
+    REALITY("Reality"),
+
     /**
      * A temporary category for client-related modules, since we don't have a client settings UI yet.
      */

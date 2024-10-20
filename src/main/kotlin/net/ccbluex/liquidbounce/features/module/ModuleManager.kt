@@ -69,6 +69,7 @@ import net.ccbluex.liquidbounce.features.module.modules.world.autofarm.ModuleAut
 import net.ccbluex.liquidbounce.features.module.modules.world.fucker.ModuleFucker
 import net.ccbluex.liquidbounce.features.module.modules.world.scaffold.ModuleScaffold
 import net.ccbluex.liquidbounce.features.module.modules.world.traps.ModuleAutoTrap
+import net.ccbluex.liquidbounce.features.module.modules.reality.*
 import net.ccbluex.liquidbounce.script.ScriptApi
 import org.lwjgl.glfw.GLFW
 
@@ -311,6 +312,9 @@ object ModuleManager : Listenable, Iterable<Module> by modules {
             ModuleNuker,
             ModuleExtinguish,
             ModuleBedDefender,
+
+            // Reality
+            ModuleRealityTest,
 
             // Client
             ModuleAutoConfig,
