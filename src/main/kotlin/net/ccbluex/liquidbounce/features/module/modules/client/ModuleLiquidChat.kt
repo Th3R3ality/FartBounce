@@ -36,7 +36,7 @@ import net.ccbluex.liquidbounce.utils.client.*
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 
-object ModuleLiquidChat : Module("LiquidChat", Category.CLIENT, hide = true, state = true,
+object ModuleLiquidChat : Module("LiquidChat", Category.CLIENT, hide = true, state = false,
     aliases = arrayOf("GlobalChat")) {
 
     private var jwtToken by text("JwtToken", "")
