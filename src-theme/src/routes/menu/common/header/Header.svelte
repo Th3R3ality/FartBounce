@@ -4,7 +4,7 @@
 </script>
 
 <div class="header">
-    <img class="logo" src="img/lb-logo.svg" alt="logo">
+    <img class="logo" src="img/wurst-logo.png" alt="logo">
 
     <Notifications />
 

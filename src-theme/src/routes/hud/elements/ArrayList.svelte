@@ -72,9 +72,9 @@
     background-color: rgba($arraylist-base-color, 0.68);
     color: $arraylist-text-color;
     font-size: 14px;
-    border-radius: 4px 0 0 4px;
+    border-radius: 0 0 0 0;
     padding: 5px 8px;
-    border-left: solid 4px $accent-color;
+    border-right: solid 2px $accent-color;
     width: max-content;
     font-weight: 500;
     margin-left: auto;
