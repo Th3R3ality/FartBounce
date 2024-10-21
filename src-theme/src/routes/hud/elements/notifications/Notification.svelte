@@ -5,64 +5,32 @@
 </script>
 
 <div class="notification">
-    <div class="icon {severity.toString().toLowerCase()}"/>
     <div class="title">{title}</div>
     <div class="message">{message}</div>
 </div>
 
 <style lang="scss">
+  @import "../../../../colors.scss";
+
   .notification {
-    display: grid;
-    grid-template-areas:
-            "a b"
-            "a c";
-    grid-template-columns: max-content 1fr;
+    display: flex;
+    flex-flow: row wrap;
+    border-left: 2px solid $accent-color;
     column-gap: 10px;
-    background: rgba(0, 0, 0, 0.68);
-    border-radius: 0px;
-    border: solid 2px #a95300;
-    width: 300px;
+    background: rgba(24, 24, 24, 1.0);
+    width: 250px;
     overflow: hidden;
     padding: 10px;
     margin-bottom: 10px;
   }
 
-  .icon {
-    height: 40px;
-    width: 40px;
-    background-position: center;
-    background-repeat: no-repeat;
-    border-radius: 0px;
-    grid-area: a;
-    transition: background-color 0.2s;
-    position: relative;
-    
-
-    &.success {
-      background-color: #00ff00;
-      background-image: url("/img/hud/notification/icon-success.svg");
-    }
-
-    &.error {
-      background-color: #ff0000;
-      background-image: url("/img/hud/notification/icon-error.svg");
-    }
-
-    &.info {
-      background-color: #a95300;
-      background-image: url("/img/hud/notification/icon-info.svg");
-    }
-  }
-
   .title {
-    grid-area: b;
-    font-size: 14px;
+    font-size: 12px;
     color: white;
-    font-weight: 600;
+    text-shadow: $accent-color 0px 0px 12px;
   }
 
   .message {
-    grid-area: c;
     font-size: 12px;
     color: #cbd1e3;
   }

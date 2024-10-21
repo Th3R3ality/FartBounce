@@ -38,7 +38,7 @@
     //position: fixed;
     //left: 15px;
     //top: 550px;
-    border-radius: 5px;
+    border-radius: 0px;
     overflow: hidden;
     font-size: 14px;
   }

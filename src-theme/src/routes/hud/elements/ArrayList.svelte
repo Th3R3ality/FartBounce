@@ -71,6 +71,7 @@
   .module {
     background-color: rgba($arraylist-base-color, 0.68);
     color: $arraylist-text-color;
+    text-shadow: $accent-color-1 0px 0px 4px, $accent-color-1 0px 0px 12px;
     font-size: 14px;
     border-radius: 0 0 0 0;
     padding: 5px 8px;
@@ -82,5 +83,5 @@
 
   .tag {
     color: $arraylist-tag-color;
-  }
+}
 </style>

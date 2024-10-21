@@ -38,6 +38,7 @@
   .main-button {
     background-color: rgba($menu-base-color, 0.68);
     width: 590px;
+    right: 0%;
     padding: 25px 35px;
     display: grid;
     grid-template-columns: max-content 1fr max-content;
