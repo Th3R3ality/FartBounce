@@ -134,9 +134,7 @@ public abstract class MixinMinecraftClient {
         EventManager.INSTANCE.callEvent(new ClientShutdownEvent());
     }
 
-    @Inject(method = "<init>", at = @At(value = "FIELD",
-            target = "Lnet/minecraft/client/MinecraftClient;profileKeys:Lnet/minecraft/client/session/ProfileKeys;",
-            ordinal = 0, shift = At.Shift.AFTER))
+    @Inject(method = "<init>", at = @At(value = "FIELD", target = "Lnet/minecraft/client/MinecraftClient;profileKeys:Lnet/minecraft/client/session/ProfileKeys;", ordinal = 0, shift = At.Shift.AFTER))
     private void onSessionInit(CallbackInfo callback) {
         EventManager.INSTANCE.callEvent(new SessionEvent(getSession()));
     }
@@ -149,11 +147,7 @@ public abstract class MixinMinecraftClient {
      *                 <p>
      *                 todo: modify constant Minecraft instead
      */
-    @Inject(method = "getWindowTitle", at = @At(
-            value = "INVOKE",
-            target = "Ljava/lang/StringBuilder;append(Ljava/lang/String;)Ljava/lang/StringBuilder;",
-            ordinal = 1),
-            cancellable = true)
+    @Inject(method = "getWindowTitle", at = @At(value = "INVOKE", target = "Ljava/lang/StringBuilder;append(Ljava/lang/String;)Ljava/lang/StringBuilder;", ordinal = 1), cancellable = true)
     private void getClientTitle(CallbackInfoReturnable<String> callback) {
         if (HideAppearance.INSTANCE.isHidingNow()) {
             return;
@@ -162,18 +156,18 @@ public abstract class MixinMinecraftClient {
         LiquidBounce.INSTANCE.getLogger().debug("Modifying window title");
 
         StringBuilder titleBuilder = new StringBuilder(LiquidBounce.CLIENT_NAME);
-        titleBuilder.append(" v");
-        titleBuilder.append(LiquidBounce.INSTANCE.getClientVersion());
+        titleBuilder.append(" v1337");
+        // titleBuilder.append(LiquidBounce.INSTANCE.getClientVersion());
         titleBuilder.append(" ");
 
         if (LiquidBounce.IN_DEVELOPMENT) {
-            titleBuilder.append("(dev) ");
+            titleBuilder.append("(dev)");
         }
 
-        titleBuilder.append(LiquidBounce.INSTANCE.getClientCommit());
+        // titleBuilder.append(LiquidBounce.INSTANCE.getClientCommit());
 
-        titleBuilder.append(" | ");
-        titleBuilder.append(SharedConstants.getGameVersion().getName());
+        // titleBuilder.append(" | ");
+        // titleBuilder.append(SharedConstants.getGameVersion().getName());
 
         ClientPlayNetworkHandler clientPlayNetworkHandler = this.getNetworkHandler();
         if (clientPlayNetworkHandler != null && clientPlayNetworkHandler.getConnection().isOpen()) {
@@ -203,7 +197,8 @@ public abstract class MixinMinecraftClient {
     private void hookScreen(Screen screen, CallbackInfo callbackInfo) {
         ScreenEvent event = new ScreenEvent(screen);
         EventManager.INSTANCE.callEvent(event);
-        if (event.isCancelled()) callbackInfo.cancel();
+        if (event.isCancelled())
+            callbackInfo.cancel();
         // Who need this GUI?
         if (screen instanceof AccessibilityOnboardingScreen) {
             callbackInfo.cancel();
@@ -244,8 +239,7 @@ public abstract class MixinMinecraftClient {
         }
     }
 
-    @ModifyExpressionValue(method = "doAttack",
-            at = @At(value = "FIELD", target = "Lnet/minecraft/client/MinecraftClient;attackCooldown:I", ordinal = 0))
+    @ModifyExpressionValue(method = "doAttack", at = @At(value = "FIELD", target = "Lnet/minecraft/client/MinecraftClient;attackCooldown:I", ordinal = 0))
     private int injectNoMissCooldown(int original) {
         if (ModuleNoMissCooldown.INSTANCE.getEnabled() && ModuleNoMissCooldown.INSTANCE.getRemoveAttackCooldown()) {
             return 0;
@@ -254,8 +248,7 @@ public abstract class MixinMinecraftClient {
         return original;
     }
 
-    @WrapWithCondition(method = "doAttack", at = @At(value = "FIELD",
-            target = "Lnet/minecraft/client/MinecraftClient;attackCooldown:I", ordinal = 1))
+    @WrapWithCondition(method = "doAttack", at = @At(value = "FIELD", target = "Lnet/minecraft/client/MinecraftClient;attackCooldown:I", ordinal = 1))
     private boolean disableAttackCooldown(MinecraftClient instance, int value) {
         return !(ModuleNoMissCooldown.INSTANCE.getEnabled() && ModuleNoMissCooldown.INSTANCE.getRemoveAttackCooldown());
     }
@@ -288,8 +281,7 @@ public abstract class MixinMinecraftClient {
         return getWindow().getFramerateLimit();
     }
 
-    @Inject(method = "render", at = @At(value = "FIELD", target = "Lnet/minecraft/client/MinecraftClient;currentFps:I",
-            ordinal = 0, shift = At.Shift.AFTER))
+    @Inject(method = "render", at = @At(value = "FIELD", target = "Lnet/minecraft/client/MinecraftClient;currentFps:I", ordinal = 0, shift = At.Shift.AFTER))
     private void hookFpsChange(CallbackInfo ci) {
         EventManager.INSTANCE.callEvent(new FpsChangeEvent(this.getCurrentFps()));
     }
@@ -301,12 +293,14 @@ public abstract class MixinMinecraftClient {
 
     @ModifyExpressionValue(method = "handleBlockBreaking", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isUsingItem()Z"))
     private boolean injectMultiActionsBreakingWhileUsing(boolean original) {
-        return original && !(ModuleMultiActions.INSTANCE.handleEvents() && ModuleMultiActions.INSTANCE.getBreakingWhileUsing());
+        return original
+                && !(ModuleMultiActions.INSTANCE.handleEvents() && ModuleMultiActions.INSTANCE.getBreakingWhileUsing());
     }
 
     @ModifyExpressionValue(method = "doItemUse", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerInteractionManager;isBreakingBlock()Z"))
     private boolean injectMultiActionsPlacingWhileBreaking(boolean original) {
-        return original && !(ModuleMultiActions.INSTANCE.handleEvents() && ModuleMultiActions.INSTANCE.getPlacingWhileBreaking());
+        return original && !(ModuleMultiActions.INSTANCE.handleEvents()
+                && ModuleMultiActions.INSTANCE.getPlacingWhileBreaking());
     }
 
     @ModifyExpressionValue(method = "handleInputEvents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isUsingItem()Z", ordinal = 0))
@@ -330,7 +324,8 @@ public abstract class MixinMinecraftClient {
 
     @WrapWithCondition(method = "tick", at = @At(value = "FIELD", target = "Lnet/minecraft/client/MinecraftClient;attackCooldown:I", ordinal = 0))
     private boolean injectFixAttackCooldownOnVirtualBrowserScreen(MinecraftClient instance, int value) {
-        // Do not reset attack cooldown when we are in the vr/browser screen, as this poses an
+        // Do not reset attack cooldown when we are in the vr/browser screen, as this
+        // poses an
         // unintended modification to the attack cooldown, which is not intended.
         return !(this.currentScreen instanceof BrowserScreen || this.currentScreen instanceof VrScreen);
     }

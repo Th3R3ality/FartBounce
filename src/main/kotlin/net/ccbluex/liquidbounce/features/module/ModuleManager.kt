@@ -314,7 +314,9 @@ object ModuleManager : Listenable, Iterable<Module> by modules {
             ModuleBedDefender,
 
             // Reality
-            ModuleRealityTest,
+            ModuleRealityDimensionWalkBegin,
+            ModuleRealityDimensionWalkFinalize,
+            ModuleRealitySilentTP,
 
             // Client
             ModuleAutoConfig,
