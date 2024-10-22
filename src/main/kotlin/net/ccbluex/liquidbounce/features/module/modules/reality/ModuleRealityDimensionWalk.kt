@@ -85,7 +85,8 @@ object ModuleRealityDimensionWalk : Module("Dimension Walk", Category.REALITY, )
         }
 
 
-        if (ModuleFly.enabled && flags > 2 && packet is PlayerMoveC2SPacket) {
+        if ( packet is PlayerMoveC2SPacket) {
+            if (ModuleFly.enabled)
             {
                 player.isOnGround = true
                 it.cancelEvent()
