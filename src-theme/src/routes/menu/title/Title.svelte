@@ -19,20 +19,7 @@
     let regularButtonsShown = true;
     let clientButtonsShown = false;
 
-    onMount(() => {
-        setTimeout(async () => {
-            const update = await getClientUpdate();
 
-            if (update.updateAvailable) {
-                notification.set({
-                    title: `Wurst ${update.newestVersion?.clientVersion} has been released!`,
-                    message: `Download it from wurstclient.net!`,
-                    error: false,
-                    delay: 99999999
-                });
-            }
-        }, 2000);
-    });
 
     function toggleButtons() {
         if (clientButtonsShown) {
@@ -77,19 +64,6 @@
                 <IconTextButton icon="icon-exit.svg" title="Exit" on:click={exitClient}/>
                 <IconTextButton icon="icon-change-background.svg" title="Toggle Shader"
                                 on:click={toggleBackgroundShaderEnabled}/>
-            </ButtonContainer>
-        </div>
-
-        <div class="social-buttons" transition:fly|global={{duration: 700, y: 100}}>
-            <ButtonContainer>
-                <IconButton title="Forum" icon="nodebb" on:click={() => browse("MAINTAINER_FORUM")}/>
-                <IconButton title="GitHub" icon="github" on:click={() => browse("MAINTAINER_GITHUB")}/>
-                <IconButton title="Guilded" icon="guilded" on:click={() => browse("MAINTAINER_GUILDED")}/>
-                <IconButton title="Discord" icon="discord" on:click={() => browse("MAINTAINER_DISCORD")}/>
-                <IconButton title="Twitter" icon="twitter" on:click={() => browse("MAINTAINER_TWITTER")}/>
-                <IconButton title="YouTube" icon="youtube" on:click={() => browse("MAINTAINER_YOUTUBE")}/>
-                <IconTextButton title="liquidbounce.net" icon="icon-liquidbounce.net.svg"
-                                on:click={() => browse("CLIENT_WEBSITE")}/>
             </ButtonContainer>
         </div>
     </div>
