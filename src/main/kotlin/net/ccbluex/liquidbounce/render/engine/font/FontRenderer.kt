@@ -232,6 +232,34 @@ class FontRenderer(
         }
     }
 
+    fun getStringHeight(
+        text: TextProcessor.ProcessedText,
+        shadow: Boolean
+    ): Float {
+        if (text.chars.isEmpty()) {
+            return 0.0f
+        }
+
+        var y = 0.0f
+
+        for (processedChar in text.chars) {
+            val glyphPage = glyphPages[processedChar.font] ?: defaultStyle
+
+            val glyph = glyphPage.staticPage.glyphs[processedChar.char] ?: glyphPage.staticPage.fallbackGlyph
+
+            val advanceY =
+                if (!processedChar.obfuscated) glyph.advanceY else glyphPage.staticPage.glyphs['_']!!.advanceY
+
+            y += advanceY
+        }
+
+        return if (shadow) {
+            y + 2.0f
+        } else {
+            y
+        }
+    }
+
     private fun drawLine(
         x0: Float,
         x: Float,

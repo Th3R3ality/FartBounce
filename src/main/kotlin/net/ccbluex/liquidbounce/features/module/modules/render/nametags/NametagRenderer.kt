@@ -23,23 +23,16 @@ import net.ccbluex.liquidbounce.render.*
 import net.ccbluex.liquidbounce.render.engine.Color4b
 import net.ccbluex.liquidbounce.render.engine.Vec3
 import net.ccbluex.liquidbounce.utils.client.asText
-import net.ccbluex.liquidbounce.render.engine.font.FontRenderer
 import net.ccbluex.liquidbounce.render.engine.font.FontRendererBuffers
 import net.ccbluex.liquidbounce.utils.client.mc
 import net.ccbluex.liquidbounce.utils.item.toRegistryEntry
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.render.VertexFormat
 import net.minecraft.item.ItemStack
-import net.minecraft.item.AirBlockItem
 import org.lwjgl.opengl.GL11
-import net.minecraft.nbt.NbtList
 import net.minecraft.nbt.*
-import net.minecraft.component.type.ItemEnchantmentsComponent
 import net.minecraft.registry.*
-import net.minecraft.registry.DynamicRegistryManager
 import net.minecraft.enchantment.*
-import net.minecraft.registry.entry.RegistryEntry
-import net.minecraft.util.Identifier
 
 private const val NAMETAG_PADDING: Int = 5
 private const val ITEM_SIZE: Int = 20
@@ -151,15 +144,13 @@ class NametagRenderer {
         matrixStack.scale(fontScale, fontScale, 1.0F)
         matrixStack.translate(-scale(width) / 2 - ITEM_SIZE / 2, -scale(height) - ITEM_SIZE / 2, pos.z)
 
-        for (idx in 0..totalItemsCount)
-        {
+        for (idx in 0..totalItemsCount) {
             var itemStack =
                 if (idx < handsItems.size) {
                     handsItems.getOrNull(idx)
-                }
-                else {
+                } else {
                     equippedItems.getOrNull(idx - handsItems.size)
-            }
+                }
 
             if (itemStack == null || itemStack.isEmpty()) {
                 continue
@@ -172,55 +163,50 @@ class NametagRenderer {
                 0,
             )
 
-            if (!ModuleNametags.items.itemCount)
-                continue
+            if (ModuleNametags.items.itemCount) {
 
-            if (itemStack!!.count > 1)
-            {
-                val text = ModuleNametags.fontRenderer.process(itemStack.count.toString().asText())
+                if (itemStack!!.count > 1) {
+                    val text = ModuleNametags.fontRenderer.process(itemStack.count.toString().asText())
 
-                ModuleNametags.fontRenderer.draw(
-                    text,
-                    scale(leftX + ITEM_SIZE - ITEM_SIZE/5),
-                    scale(ITEM_SIZE - ITEM_SIZE/5) - ModuleNametags.fontRenderer.height,
-                    shadow = true,
-                )
+                    ModuleNametags.fontRenderer.draw(
+                        text,
+                        scale(leftX + ITEM_SIZE - ITEM_SIZE / 5) - ModuleNametags.fontRenderer.getStringWidth(text),
+                        scale(ITEM_SIZE - ITEM_SIZE / 5) - ModuleNametags.fontRenderer.height,
+                        shadow = true,
+                    )
+                }
             }
 
-            if (!ModuleNametags.items.showEnchants.enabled)
-                continue
+            if (ModuleNametags.items.showEnchants.enabled) {
 
-            val enchants = itemStack!!.enchantments
+                var enchantCount: Int = 0
+                fun drawItemEnchant(identifier: String, level: Int) {
+                    if (level < 1)
+                        return
 
+                    val str = if (ModuleNametags.items.showEnchants.capitalEnchants) {
+                        identifier.uppercase() + level.toString()
+                    } else {
+                        identifier.lowercase() + level.toString()
+                    }
 
-            val protID = if (ModuleNametags.items.showEnchants.capitalEnchants) {"P"} else {"p"}
-            val protLevel = enchants.getLevel(Enchantments.PROTECTION.toRegistryEntry())
-            if (protLevel > 1)
-            {
-                val text = ModuleNametags.fontRenderer.process(protID + protLevel.toString())
+                    val _text = ModuleNametags.fontRenderer.process(str)
 
-                ModuleNametags.fontRenderer.draw(
-                    text,
-                    scale(leftX + ITEM_SIZE - ITEM_SIZE/5),
-                    scale(ITEM_SIZE/5) - ModuleNametags.fontRenderer.height,
-                    shadow = true,
-                )
-                continue
-            }
+                    ModuleNametags.fontRenderer.draw(
+                        _text,
+                        scale(leftX),
+                        scale(ITEM_SIZE / 5) - ModuleNametags.fontRenderer.height - ModuleNametags.fontRenderer.height * enchantCount,
+                        shadow = true,
+                    )
+                    enchantCount++
+                }
 
-            val sharpID = if (ModuleNametags.items.showEnchants.capitalEnchants) {"S"} else {"s"}
-            val sharpLevel = enchants.getLevel(Enchantments.SHARPNESS.toRegistryEntry())
-            if (sharpLevel > 1)
-            {
-                val text = ModuleNametags.fontRenderer.process(sharpID + sharpLevel.toString())
+                val enchants = itemStack!!.enchantments
 
-                ModuleNametags.fontRenderer.draw(
-                    text,
-                    scale(leftX + ITEM_SIZE - ITEM_SIZE/5),
-                    scale(ITEM_SIZE/5) - ModuleNametags.fontRenderer.height,
-                    shadow = true,
-                )
-                continue
+                drawItemEnchant("P", enchants.getLevel(Enchantments.PROTECTION.toRegistryEntry()))
+                drawItemEnchant("S", enchants.getLevel(Enchantments.SHARPNESS.toRegistryEntry()))
+                drawItemEnchant("KB", enchants.getLevel(Enchantments.KNOCKBACK.toRegistryEntry()))
+
             }
         }
 

@@ -87,7 +87,7 @@ class NametagInfo(
                     listOf(firstHandItem, secondHandItem)
             }
 
-            return heldItems.filterNotNull()
+            return heldItems.filterNotNull().filterNot{ it.isEmpty() }.reversed()
         }
 
         private fun createArmorItemList(entity: Entity): List<ItemStack?>{
@@ -96,7 +96,7 @@ class NametagInfo(
             }
             val equippedItems = entity.armorItems.asSequence().toList()
 
-            return equippedItems.filterNotNull()
+            return equippedItems.filterNotNull().filterNot{ it.isEmpty() }.reversed()
         }
     }
 }
