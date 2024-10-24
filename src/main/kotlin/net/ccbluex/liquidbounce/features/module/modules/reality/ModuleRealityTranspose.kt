@@ -36,7 +36,7 @@ object ModuleRealityTranspose : Module("Transpose", Category.REALITY, ) {
             if ( ModuleRealityDimensionWalk.flags > 2)
             {
                 chat("Transposing")
-                player.updatePosition(player.x, player.y + 100f, player.z)
+                player.updatePosition(player.x, player.y - 100f, player.z)
             }
             else
             {
