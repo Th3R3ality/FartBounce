@@ -22,12 +22,24 @@ import com.mojang.blaze3d.systems.RenderSystem
 import net.ccbluex.liquidbounce.render.*
 import net.ccbluex.liquidbounce.render.engine.Color4b
 import net.ccbluex.liquidbounce.render.engine.Vec3
+import net.ccbluex.liquidbounce.utils.client.asText
+import net.ccbluex.liquidbounce.render.engine.font.FontRenderer
 import net.ccbluex.liquidbounce.render.engine.font.FontRendererBuffers
 import net.ccbluex.liquidbounce.utils.client.mc
+import net.ccbluex.liquidbounce.utils.item.toRegistryEntry
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.render.VertexFormat
 import net.minecraft.item.ItemStack
+import net.minecraft.item.AirBlockItem
 import org.lwjgl.opengl.GL11
+import net.minecraft.nbt.NbtList
+import net.minecraft.nbt.*
+import net.minecraft.component.type.ItemEnchantmentsComponent
+import net.minecraft.registry.*
+import net.minecraft.registry.DynamicRegistryManager
+import net.minecraft.enchantment.*
+import net.minecraft.registry.entry.RegistryEntry
+import net.minecraft.util.Identifier
 
 private const val NAMETAG_PADDING: Int = 5
 private const val ITEM_SIZE: Int = 20
@@ -85,36 +97,135 @@ class NametagRenderer {
             lineBuffers.drawQuadOutlines(env, q1, q2)
         }
 
-        if (ModuleNametags.items) {
-            drawItemList(pos, info.items)
+        matrixStack.pop()
+
+        if (ModuleNametags.items.enabled) {
+            drawItemList(env, pos, info.hands, info.equipped)
         }
 
-        matrixStack.pop()
     }
 
     private fun drawItemList(
+        env: RenderEnvironment,
         pos: Vec3,
-        itemsToRender: List<ItemStack?>,
-    ) {
-        val dc = DrawContext(mc, mc.bufferBuilders.entityVertexConsumers)
+        handsItems: List<ItemStack?>,
+        equippedItems: List<ItemStack?>,
+    ) = with(env) {
+        val totalItemsCount = handsItems.size + equippedItems.size
 
-        dc.matrices.translate(pos.x, pos.y - NAMETAG_PADDING, pos.z)
-        dc.matrices.scale(ITEM_SCALE * ModuleNametags.scale, ITEM_SCALE * ModuleNametags.scale, 1.0F)
-        dc.matrices.translate(-itemsToRender.size * ITEM_SIZE / 2.0F, -ITEM_SIZE.toFloat(), 0.0F)
+        val width = totalItemsCount * ITEM_SIZE
+        val height = ITEM_SIZE
 
-        dc.fill(
-            0,
-            0,
-            itemsToRender.size * ITEM_SIZE,
-            ITEM_SIZE,
-            Color4b.BLACK.alpha(0).toRGBA()
+        val dc = DrawContext(
+            mc,
+            mc.bufferBuilders.entityVertexConsumers
         )
+
+        val itemScale = ITEM_SCALE * ModuleNametags.scale
+        dc.matrices.translate(pos.x, pos.y - NAMETAG_PADDING, pos.z)
+        dc.matrices.scale(itemScale, itemScale, 1.0F)
+        dc.matrices.translate(-width / 2.0F, -ITEM_SIZE.toFloat(), pos.z)
+
+        if (ModuleNametags.items.itemsBackground)
+        {
+            // draw background
+            dc.fill(
+                -itemScale.toInt() - NAMETAG_PADDING/2,
+                -itemScale.toInt() - NAMETAG_PADDING/2,
+                width + itemScale.toInt() - NAMETAG_PADDING/2,
+                height + itemScale.toInt() - NAMETAG_PADDING/2,
+                Color4b(0, 0, 0, 128).toRGBA()
+            )
+        }
 
         dc.matrices.translate(0.0F, 0.0F, 100.0F)
 
-        itemsToRender.forEachIndexed { index, itemStack ->
-            dc.drawItem(itemStack, index * ITEM_SIZE, 0)
+        val c = ModuleNametags.fontRenderer.size
+        val fontScale = 1.0F / (c * 0.15F) * ModuleNametags.scale
+
+        // sync x pos between item and count
+        fun scale(f: Int) = f * itemScale / fontScale
+
+        matrixStack.push()
+        matrixStack.translate(pos.x, pos.y, pos.z)
+        matrixStack.scale(fontScale, fontScale, 1.0F)
+        matrixStack.translate(-scale(width) / 2 - ITEM_SIZE / 2, -scale(height) - ITEM_SIZE / 2, pos.z)
+
+        for (idx in 0..totalItemsCount)
+        {
+            var itemStack =
+                if (idx < handsItems.size) {
+                    handsItems.getOrNull(idx)
+                }
+                else {
+                    equippedItems.getOrNull(idx - handsItems.size)
+            }
+
+            if (itemStack == null || itemStack.isEmpty()) {
+                continue
+            }
+            val leftX = idx * ITEM_SIZE
+
+            dc.drawItem(
+                itemStack,
+                leftX,
+                0,
+            )
+
+            if (!ModuleNametags.items.itemCount)
+                continue
+
+            if (itemStack!!.count > 1)
+            {
+                val text = ModuleNametags.fontRenderer.process(itemStack.count.toString().asText())
+
+                ModuleNametags.fontRenderer.draw(
+                    text,
+                    scale(leftX + ITEM_SIZE - ITEM_SIZE/5),
+                    scale(ITEM_SIZE - ITEM_SIZE/5) - ModuleNametags.fontRenderer.height,
+                    shadow = true,
+                )
+            }
+
+            if (!ModuleNametags.items.showEnchants.enabled)
+                continue
+
+            val enchants = itemStack!!.enchantments
+
+
+            val protID = if (ModuleNametags.items.showEnchants.capitalEnchants) {"P"} else {"p"}
+            val protLevel = enchants.getLevel(Enchantments.PROTECTION.toRegistryEntry())
+            if (protLevel > 1)
+            {
+                val text = ModuleNametags.fontRenderer.process(protID + protLevel.toString())
+
+                ModuleNametags.fontRenderer.draw(
+                    text,
+                    scale(leftX + ITEM_SIZE - ITEM_SIZE/5),
+                    scale(ITEM_SIZE/5) - ModuleNametags.fontRenderer.height,
+                    shadow = true,
+                )
+                continue
+            }
+
+            val sharpID = if (ModuleNametags.items.showEnchants.capitalEnchants) {"S"} else {"s"}
+            val sharpLevel = enchants.getLevel(Enchantments.SHARPNESS.toRegistryEntry())
+            if (sharpLevel > 1)
+            {
+                val text = ModuleNametags.fontRenderer.process(sharpID + sharpLevel.toString())
+
+                ModuleNametags.fontRenderer.draw(
+                    text,
+                    scale(leftX + ITEM_SIZE - ITEM_SIZE/5),
+                    scale(ITEM_SIZE/5) - ModuleNametags.fontRenderer.height,
+                    shadow = true,
+                )
+                continue
+            }
         }
+
+        ModuleNametags.fontRenderer.commit(fontBuffers)
+        matrixStack.pop()
     }
 
     fun commit(env: RenderEnvironment) {

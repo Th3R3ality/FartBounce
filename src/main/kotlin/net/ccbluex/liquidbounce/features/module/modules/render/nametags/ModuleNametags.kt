@@ -42,13 +42,27 @@ import net.minecraft.entity.Entity
  */
 
 object ModuleNametags : Module("Nametags", Category.RENDER) {
-    val items by boolean("Items", true)
+
+    object items : ToggleableConfigurable(this, "Items", true) {
+        val itemsBackground by boolean("Item Background", false)
+
+        val itemCount by boolean("Item Count", true)
+
+        object showEnchants : ToggleableConfigurable(this, "Show Enchants", true) {
+            val capitalEnchants by boolean("Capitalised", true)
+        }
+
+        init {
+            tree(showEnchants)
+        }
+    }
 
     object Health : ToggleableConfigurable(this, "Health", true) {
         val fromScoreboard by boolean("FromScoreboard", false)
     }
 
     init {
+        tree(items)
         tree(Health)
     }
 
