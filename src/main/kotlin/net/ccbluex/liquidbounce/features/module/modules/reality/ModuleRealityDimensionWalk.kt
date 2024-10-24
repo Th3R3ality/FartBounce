@@ -49,6 +49,7 @@ object ModuleRealityDimensionWalk : Module("Dimension Walk", Category.REALITY, )
         else
         {
             chat("Disposition Cancelled")
+            ModuleRealitySilentTP.enabled = false
         }
 
     }
@@ -76,6 +77,7 @@ object ModuleRealityDimensionWalk : Module("Dimension Walk", Category.REALITY, )
 
                     successful = true
                     this.enabled = false
+                    ModuleRealitySilentTP.enabled = false
 
                     return@handler
                 }
@@ -86,7 +88,14 @@ object ModuleRealityDimensionWalk : Module("Dimension Walk", Category.REALITY, )
 
 
         if ( packet is PlayerMoveC2SPacket) {
-            if (ModuleFly.enabled)
+            if (ModuleRealitySilentTP.enabled)
+            {
+                packet.x += ModuleRealitySilentTP.moveOffset
+                packet.y -= 100f
+                ModuleRealitySilentTP.moveOffset += 0.1f
+                return@handler
+            }
+            else if (ModuleFly.enabled)
             {
                 player.isOnGround = true
                 it.cancelEvent()

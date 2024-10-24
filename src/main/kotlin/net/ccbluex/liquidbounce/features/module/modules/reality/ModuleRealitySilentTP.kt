@@ -26,27 +26,28 @@ import com.mojang.blaze3d.systems.RenderSystem
 
 object ModuleRealitySilentTP : Module("Silent Transpose", Category.REALITY, ) {
 
+    var moveOffset: Float = 0f
 
     override fun enable(){
-        for (i in 0..10)
+
+        if (ModuleRealityDimensionWalk.enabled)
         {
-            network.sendPacket(
-                PlayerMoveC2SPacket.Full(
-                    player.x + i * 0.08f,
-                    player.y + 100f,
-                    player.z,
-                    player.yaw,
-                    player.pitch,
-                    true
-                )
-            )
+            if ( ModuleRealityDimensionWalk.flags > 2)
+            {
+                chat("Attempting Transposition")
+            }
+            else
+            {
+                chat("Wormhole hasn't opened yet...")
+            }
         }
-
-
-        RenderSystem.recordRenderCall {
-            this.enabled = false
+        else
+        {
+            chat("Please enable Dimension Walk™ before transposing")
         }
     }
 
+    override fun disable(){
 
+    }
 }
