@@ -24,7 +24,7 @@ import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket
 import net.ccbluex.liquidbounce.utils.client.sendPacketSilently
 import com.mojang.blaze3d.systems.RenderSystem
 
-object ModuleRealitySilentTP : Module("Silent Transpose", Category.REALITY, ) {
+object ModuleRealitySilentTP : Module("SilentTranspose", Category.REALITY, ) {
 
     var moveOffset: Float = 0f
 

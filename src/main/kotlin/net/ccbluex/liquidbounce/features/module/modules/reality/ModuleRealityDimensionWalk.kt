@@ -25,7 +25,7 @@ import net.ccbluex.liquidbounce.utils.client.sendPacketSilently
 import net.ccbluex.liquidbounce.features.module.modules.movement.fly.ModuleFly
 import net.ccbluex.liquidbounce.features.module.modules.movement.fly.modes.*
 
-object ModuleRealityDimensionWalk : Module("Dimension Walk", Category.REALITY, ) {
+object ModuleRealityDimensionWalk : Module("DimensionWalk", Category.REALITY, ) {
 
     // 2.5 is the maximum timer tested.
     private val timer by float("Timer", 1f, 1f..2.5f)

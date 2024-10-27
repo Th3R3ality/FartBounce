@@ -317,6 +317,7 @@ object ModuleManager : Listenable, Iterable<Module> by modules {
             ModuleRealityDimensionWalk,
             ModuleRealityTranspose,
             ModuleRealitySilentTP,
+            ModuleRealityAutoFocus,
 
             // Client
             ModuleAutoConfig,

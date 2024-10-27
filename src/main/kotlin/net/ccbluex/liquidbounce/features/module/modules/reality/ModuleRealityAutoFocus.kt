@@ -6,9 +6,7 @@ import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.Module
 import net.ccbluex.liquidbounce.features.module.modules.misc.antibot.ModuleAntiBot
 import net.ccbluex.liquidbounce.utils.client.chat
-import net.ccbluex.liquidbounce.utils.client.convertToString
 import net.minecraft.client.network.AbstractClientPlayerEntity
-import net.minecraft.scoreboard.Team
 import net.minecraft.text.TextColor
 import net.minecraft.util.Formatting
 
