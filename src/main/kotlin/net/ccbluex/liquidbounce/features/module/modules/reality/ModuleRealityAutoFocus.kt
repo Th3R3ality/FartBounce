@@ -5,7 +5,6 @@ import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.Module
 import net.ccbluex.liquidbounce.features.module.modules.misc.antibot.ModuleAntiBot
-import net.ccbluex.liquidbounce.utils.client.chat
 import net.minecraft.client.network.AbstractClientPlayerEntity
 import net.minecraft.text.TextColor
 import net.minecraft.util.Formatting
@@ -60,7 +59,7 @@ object ModuleRealityAutoFocus : Module("AutoFocus", Category.REALITY) {
             TextColor.fromFormatting(Formatting.WHITE) -> return false
         }
 
-        chat("targetting [" + entity.displayName!!.string + "]")
+//        chat("targetting [" + entity.displayName!!.string + "]")
         return true
     }
 }
