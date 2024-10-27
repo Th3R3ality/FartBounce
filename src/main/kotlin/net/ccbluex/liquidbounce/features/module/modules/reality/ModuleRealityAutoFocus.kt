@@ -11,15 +11,6 @@ import net.minecraft.util.Formatting
 
 object ModuleRealityAutoFocus : Module("AutoFocus", Category.REALITY) {
 
-    override fun enable(){
-        val pl = mc.player?.networkHandler?.playerList
-
-        pl!!.forEach { it ->
-
-            it.displayName?.let { it1 -> println(it1.string) }
-        }
-    }
-
     /**
      * This option will only focus the enemy on combat modules
      */
