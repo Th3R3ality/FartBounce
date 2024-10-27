@@ -374,6 +374,7 @@ object ModuleManager : Listenable, Iterable<Module> by modules {
         modules.clear()
     }
 
+    @Suppress("unused")
     fun autoComplete(begin: String, args: List<String>, validator: (Module) -> Boolean = { true }): List<String> {
         val parts = begin.split(",")
         val matchingPrefix = parts.last()
