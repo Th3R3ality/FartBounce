@@ -18,7 +18,7 @@ export async function updatePersistentData() {
         clearTimeout(persistentDataUpdateTimeout);
     }
 
-    persistentDataUpdateTimeout = setTimeout(async () => {
+    persistentDataUpdateTimeout = window.setTimeout(async () => {
         if (!loadedOnce) {
             return;
         }

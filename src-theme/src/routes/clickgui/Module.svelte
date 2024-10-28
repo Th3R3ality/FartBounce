@@ -82,8 +82,6 @@
         class="module"
         class:expanded
         class:has-settings={configurable?.value.length > 2}
-        in:slide={{ duration: 500, easing: quintOut }}
-        out:slide={{ duration: 500, easing: quintOut }}
 >
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div
@@ -120,15 +118,13 @@
 
     .name {
       cursor: pointer;
-      transition: ease background-color 0.2s,
-      ease color 0.2s;
 
       color: $clickgui-text-dimmed-color;
-      text-align: center;
-      font-size: 12px;
+      text-align: left;
+      font-size: 14px;
       font-weight: 500;
       position: relative;
-      padding: 10px;
+      padding: 11px 11px 11px 11px;
 
       &.highlight::before {
         content: "";
@@ -146,13 +142,17 @@
       }
 
       &.enabled {
-        color: $accent-color;
+        color: $clickgui-text-enabled-color;
+        background: $clickgui-module-enabled-color;
+        border-style: solid;
+        border-bottom-color: darken($clickgui-module-enabled-color, 10%);
+        border-width: 0 0 1px 0;
+        padding-bottom: 10px;
       }
     }
 
     .settings {
       background-color: rgba($clickgui-base-color, 0.5);
-      border-left: solid 4px $accent-color;
       padding: 0 11px 0 7px;
     }
 

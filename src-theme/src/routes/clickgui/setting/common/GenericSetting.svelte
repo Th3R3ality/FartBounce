@@ -31,7 +31,7 @@
 </script>
 
 {#if ready}
-    <div in:slide|global={{duration: 200, axis: "y"}} out:slide|global={{duration: 200, axis: "y"}}>
+    <div >
         {#if setting.valueType === "BOOLEAN"}
             <BooleanSetting bind:setting={setting} on:change/>
         {:else if setting.valueType === "CHOICE"}

@@ -1,11 +1,14 @@
-$accent-color: #a95300;
-$accent-color-1: #a95300;
+$accent-color: #0080ff;
+$accent-color-1: #0080ff;
 $accent-color-2: #ffffff;
 
 
-$clickgui-base-color: black;
-$clickgui-text-color: white;
-$clickgui-text-dimmed-color: rgba(211, 211, 211, 255);
+$clickgui-base-color: #1a191a;
+$clickgui-text-color: #D1D1D1;
+$clickgui-text-dimmed-color: #CFCFCF;
+
+$clickgui-text-enabled-color: white;
+$clickgui-module-enabled-color: $accent-color;
 
 $tabgui-base-color: black;
 $tabgui-text-color: white;

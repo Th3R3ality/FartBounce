@@ -55,7 +55,6 @@
       top: -2px;
       left: 0;
       background-color: $clickgui-text-color;
-      transition: ease 0.4s;
       border-radius: 50%;
     }
   }

@@ -158,9 +158,9 @@
 
             modulesElement.scrollTo({
                 top: panelConfig.scrollTop,
-                behavior: "smooth"
+                behavior: "instant"
             })
-        }, 500);
+        }, 100);
     });
 </script>
 
@@ -170,8 +170,6 @@
         class="panel"
         style="left: {panelConfig.left}px; top: {panelConfig.top}px; z-index: {panelConfig.zIndex};"
         bind:this={panelElement}
-        in:fly|global={{y: -30, duration: 200, easing: quintOut}}
-        out:fly|global={{y: -30, duration: 200, easing: quintOut}}
 >
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div
@@ -179,11 +177,15 @@
             on:mousedown={onMouseDown}
             on:contextmenu|preventDefault={toggleExpanded}
     >
+        <object
+            data="img/clickgui/icon-{category.toLowerCase()}.svg"
+            type="image/svg+xml" height="15">
         <img
-                class="icon"
-                src="img/clickgui/icon-{category.toLowerCase()}.svg"
+                src="img/clickgui/icon-{category.toLowerCase()}.png"
                 alt="icon"
+                height="15"
         />
+        </object>
         <span class="category">{category}</span>
 
         <button class="expand-toggle" on:click={toggleExpanded}>
@@ -203,11 +205,15 @@
 
   .panel {
     border-radius: 5px;
-    width: 250px;
+    width: 220px;
     position: absolute;
     overflow: hidden;
-    box-shadow: 0 0 10px rgba($clickgui-base-color, 0.5);
+    box-shadow: inset 0 0 5px #161616, 0 0 10px #000a;
     will-change: transform;
+    border-style: solid;
+    border-width: 1.1px;
+    border-color: #2d2d2d;
+    background: #1A191A;
   }
 
   .title {
@@ -215,9 +221,7 @@
     grid-template-columns: max-content 1fr max-content;
     align-items: center;
     column-gap: 12px;
-    background-color: rgba($clickgui-base-color, 0.9);
-    border-bottom: solid 2px $accent-color;
-    padding: 10px 15px;
+    padding: 11px 11px;
     cursor: grab;
 
     .category {
@@ -244,43 +248,19 @@
     cursor: pointer;
 
     .icon {
-      height: 12px;
+      height: 16px;
       width: 12px;
+      scale: 1 -1;
       position: relative;
-
-      &::before {
-        content: "";
-        position: absolute;
-        background-color: white;
-        transition: transform 0.4s ease-out;
-        top: 0;
-        left: 50%;
-        width: 2px;
-        height: 100%;
-        margin-left: -1px;
-      }
-
-      &::after {
-        content: "";
-        position: absolute;
-        background-color: white;
-        transition: transform 0.4s ease-out;
-        top: 50%;
-        left: 0;
-        width: 100%;
-        height: 2px;
-        margin-top: -1px;
-      }
+      background-image: url("/img/clickgui/icon-panel-arrow.png");
 
       &.expanded {
-        &::before {
-          transform: rotate(90deg);
-        }
-
-        &::after {
-          transform: rotate(180deg);
-        }
+        transform: scaleY(-1);
       }
+    }
+
+    .icon:hover{
+      background-image: url("/img/clickgui/icon-panel-arrow-hover.png");
     }
   }
 </style>
