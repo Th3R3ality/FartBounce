@@ -88,7 +88,7 @@ dependencies {
     // Recommended mods (on IDE)
     modRuntimeOnly "com.terraformersmc:modmenu:${project.mod_menu_version}"
     modImplementation "maven.modrinth:sodium:${project.sodium_version}"
-    modCompileOnly "de.florianmichael:ViaFabricPlus:${project.viafabricplus_version}"
+    modImplementation "de.florianmichael:ViaFabricPlus:${project.viafabricplus_version}"
 
     // Tests
 //    modImplementation 'com.github.superblaubeere27:tenacc:e3a7ada99a'
@@ -106,7 +106,7 @@ dependencies {
         exclude group: 'com.mojang', module: 'authlib'
     }
     implementation "com.github.CCBlueX:mcef:916f8c5f73"
-
+    implementation 'com.github.CCBlueX:netty-httpserver:2.1.0'
     implementation "com.github.CCBlueX:DiscordIPC:-SNAPSHOT"
 
     implementation 'org.graalvm.sdk:graal-sdk:23.0.5'
@@ -284,6 +284,7 @@ shadowJar {
 
     dependencies {
         include(dependency('com.github.CCBlueX:mcef'))
+        include(dependency('com.github.CCBlueX:netty-httpserver'))
         include(dependency('com.github.CCBlueX:mc-authlib'))
         include(dependency('com.github.CCBlueX:DiscordIPC'))
         include(dependency('com.thealtening.api:api'))
