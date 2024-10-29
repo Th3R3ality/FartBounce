@@ -8,12 +8,11 @@
 </script>
 
 <label class="switch-container">
+    <div class="name">{name}</div>
     <div class="switch">
         <input type="checkbox" bind:checked={value} on:change={() => dispatch("change")}/>
         <span class="slider"></span>
     </div>
-
-    <div class="name">{name}</div>
 </label>
 
 <style lang="scss">
@@ -38,24 +37,26 @@
 
   .slider {
     position: absolute;
-    top: 2px;
+    top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: darken($clickgui-text-color, 55%);
-    transition: ease 0.4s;
-    height: 8px;
-    border-radius: 4px;
+    background-color: #363536;
+    transition: ease .2s;
+    height: 12px;
+    border-radius: 6px;
+    width: 22px;
 
     &::before {
       position: absolute;
       content: "";
-      height: 12px;
-      width: 12px;
-      top: -2px;
-      left: 0;
-      background-color: $clickgui-text-color;
+      height: 8px;
+      width: 8px;
+      top: 2px;
+      left: 2px;
+      background-color: $clickgui-base-color;
       border-radius: 50%;
+      transition: ease .2s;
     }
   }
 
@@ -63,21 +64,19 @@
     position: relative;
     width: 22px;
     height: 12px;
+    margin-left: auto;
+    margin-right: 0;
 
     input {
       display: none;
     }
 
     input:checked + .slider {
-      background-color: color.scale(
-                      desaturate($accent-color, 60%),
-              $lightness: -15%
-      );
+      background-color: $accent-color
     }
 
     input:checked + .slider:before {
       transform: translateX(10px);
-      background-color: $accent-color;
     }
   }
 </style>

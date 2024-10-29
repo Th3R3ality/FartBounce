@@ -94,12 +94,16 @@
             class:enabled
             class:highlight={name === $highlightModuleName}
     >
+        <span>
         {#if $spaceSeperatedNames}
             {convertToSpacedString(name)}
         {:else}
             {name}
         {/if}
+        </span>
+        <div class="expand-toggle"/>
     </div>
+
 
     {#if expanded && configurable}
         <div class="settings">
@@ -124,7 +128,10 @@
       font-size: 14px;
       font-weight: 500;
       position: relative;
-      padding: 11px 11px 11px 11px;
+      padding: 11px;
+      border-style: solid;
+      border-bottom-color: $clickgui-base-color;
+      border-width: 0 0 1px 0;
 
       &.highlight::before {
         content: "";
@@ -137,8 +144,22 @@
       }
 
       &:hover {
-        background-color: rgba($clickgui-base-color, 0.85);
+        background-color: $clickgui-module-hover-color;
         color: $clickgui-text-color;
+      }
+
+      .expand-toggle {
+        background-color: transparent;
+        height: 30px;
+        width: 30px;
+        scale: 1 -1;
+        position: absolute;
+        background-image: url("/img/clickgui/icon-expand.png");
+        background-repeat: no-repeat;
+        overflow: clip;
+        right: 5px;
+        top: 5px;
+        background-position: 50%;
       }
 
       &.enabled {
@@ -147,38 +168,18 @@
         border-style: solid;
         border-bottom-color: darken($clickgui-module-enabled-color, 10%);
         border-width: 0 0 1px 0;
-        padding-bottom: 10px;
+
+        .expand-toggle{
+          background-image: url("/img/clickgui/icon-expand-dark.png");
+        }
       }
     }
 
     .settings {
-      background-color: rgba($clickgui-base-color, 0.5);
+      background-color: $clickgui-module-settings-background;
       padding: 0 11px 0 7px;
     }
-
-    &.has-settings {
-      .name::after {
-        content: "";
-        display: block;
-        position: absolute;
-        height: 10px;
-        width: 10px;
-        right: 15px;
-        top: 50%;
-        background-image: url("/img/clickgui/icon-settings-expand.svg");
-        background-position: center;
-        background-repeat: no-repeat;
-        opacity: 0.5;
-        transform-origin: 50% 50%;
-        transform: translateY(-50%) rotate(-90deg);
-        transition: ease opacity 0.2s,
-        ease transform 0.4s;
-      }
-
-      &.expanded .name::after {
-        transform: translateY(-50%) rotate(0);
-        opacity: 1;
-      }
-    }
   }
+
+
 </style>

@@ -1,60 +1,47 @@
-// By @paulofalcao
-//
-// Blobs
-
 #ifdef GL_ES
 precision highp float;
 #endif
 
+#define repeat(i, n) for(int i = 0; i < n; i++)
+
 uniform float time;
-uniform vec2 mouse;
+
 uniform vec2 resolution;
 
-float makePoint(float x,float y,float fx,float fy,float sx,float sy,float t){
-   float xx=x+sin(t*fx)*sx;
-   float yy=y+cos(t*fy)*sy;
-   return 1.0/sqrt(xx*xx+yy*yy);
-}
-
-void main( void ) {
-
-   vec2 p=(gl_FragCoord.xy/resolution.x)*2.0-vec2(1.0,resolution.y/resolution.x);
-
-   p=p*2.0;
-   
-   float x=p.x;
-   float y=p.y;
-
-   float a=
-       makePoint(x,y,3.3,2.9,0.3,0.3,time);
-   a=a+makePoint(x,y,1.9,2.0,0.4,0.4,time);
-   a=a+makePoint(x,y,0.8,0.7,0.4,0.5,time);
-   a=a+makePoint(x,y,2.3,0.1,0.6,0.3,time);
-   a=a+makePoint(x,y,1.8,1.7,0.5,0.4,time);   
-   
-   float b=
-       makePoint(x,y,1.2,1.9,0.3,0.3,time);
-   b=b+makePoint(x,y,0.7,2.7,0.4,0.4,time);
-   b=b+makePoint(x,y,1.4,0.6,0.4,0.5,time);
-   b=b+makePoint(x,y,2.6,0.4,0.6,0.3,time);
-   b=b+makePoint(x,y,0.7,1.4,0.5,0.4,time);
-   b=b+makePoint(x,y,0.7,1.7,0.4,0.4,time);
-   b=b+makePoint(x,y,0.8,0.5,0.4,0.5,time);
-   b=b+makePoint(x,y,1.4,0.9,0.6,0.3,time);
-   b=b+makePoint(x,y,0.7,1.3,0.5,0.4,time);
-
-   float c=
-       makePoint(x,y,3.7,0.3,0.3,0.3,time);
-   c=c+makePoint(x,y,1.9,1.3,0.4,0.4,time);
-   c=c+makePoint(x,y,0.8,0.9,0.4,0.5,time);
-   c=c+makePoint(x,y,1.2,1.7,0.6,0.3,time);
-   c=c+makePoint(x,y,0.3,0.6,0.5,0.4,time);
-   c=c+makePoint(x,y,0.3,0.3,0.4,0.4,time);
-   c=c+makePoint(x,y,1.4,0.8,0.4,0.5,time);
-   c=c+makePoint(x,y,0.2,0.6,0.6,0.3,time);
-   c=c+makePoint(x,y,1.3,0.5,0.5,0.4,time);
-   
-   vec3 d=vec3(a,b,c)/32.0;
-   
-   gl_FragColor = vec4(d.x,d.y,d.z,1.0);
+void main(void)
+{
+    vec2 uv = gl_FragCoord.xy / resolution.xy - 1.;
+    uv.y *= resolution.y / resolution.x;
+    float mul = resolution.x / resolution.y;
+    vec3 dir = vec3(uv * mul, 1.);
+    float a2 = time * 20. + .5;
+    float a1 = 1.0;
+    mat2 rot1 = mat2(cos(a1), sin(a1), - sin(a1), cos(a1));
+    mat2 rot2 = rot1;
+    dir.xz *= rot1;
+    dir.xy *= rot2;
+    vec3 from = vec3(0., 0., 0.);
+    from += vec3(.0025 * time, .03 * time, - 2.);
+    from.xz *= rot1;
+    from.xy *= rot2;
+    float s = .1, fade = .07;
+    vec3 v = vec3(0.4);
+    repeat(r, 10) {
+	vec3 p = from + s * dir * 1.5;
+	p = abs(vec3(0.750) - mod(p, vec3(0.750 * 2.)));
+	p.x += float(r * r) * 0.01;
+	p.y += float(r) * 0.02;
+	float pa, a = pa = 0.;
+	repeat(i, 12) {
+	    p = abs(p) / dot(p, p) - 0.340;
+	    a += abs(length(p) - pa * 0.2);
+	    pa = length(p);
+	}
+	a *= a * a * 2.;
+	v += vec3(s * s , s , s * s) * a * 0.0017 * fade;
+	fade *= 0.960;
+	s += 0.110;
+    }
+    v = mix(vec3(length(v)), v, 0.8);
+    gl_FragColor = vec4(v * 0.01, 1.);
 }
