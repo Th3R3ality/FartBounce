@@ -212,7 +212,7 @@
     will-change: transform;
     border-style: solid;
     border-width: 1.1px;
-    border-color: #2d2d2d;
+    border-color: #2d2d2d2d;
     background: #1A191A;
   }
 
