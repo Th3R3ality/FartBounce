@@ -52,7 +52,7 @@ class NametagTextFormatter(private val entity: Entity) {
         outputText.append(nameString.asText().styled { it.withColor(this.nameColor) })
 
         if (ModuleNametags.Health.enabled) {
-            outputText.append(" ").append(this.healthText)
+            outputText.append(this.healthText).append(this.absorptionText)
         }
 
         if (this.isBot) {
@@ -116,7 +116,24 @@ class NametagTextFormatter(private val entity: Entity) {
                 else -> Formatting.RED
             }
 
-            return withColor("$actualHealth HP", healthColor)
+            return withColor(" $actualHealth", healthColor)
+
+        }
+
+    private val absorptionText: Text
+        get() {
+            if (entity !is LivingEntity) {
+                return regular("")
+            }
+
+            val absorptionAmount = entity.absorptionAmount.toInt()
+
+            if (!(absorptionAmount > 0)) {return regular("")}
+
+            val absorptionColor = Formatting.GOLD
+
+
+            return withColor(" $absorptionAmount", absorptionColor)
 
         }
 }

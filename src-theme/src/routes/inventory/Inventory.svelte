@@ -1,11 +1,10 @@
-<img class="watermark" src="img/wurst-logo.png" alt="watermark">
+<img class="watermark" src="img/logo.png" alt="watermark">
 
 <style>
     .watermark {
         position: absolute;
-        top: 15px;
-        right: 50%;
+        bottom: 0;
+        right: 0;
         width: 165px;
-        transform: translate(50%, 0);
     }
 </style>

@@ -82,12 +82,12 @@ object LiquidBounce : Listenable {
      *
      * WARNING: Please read the GNU General Public License
      */
-    const val CLIENT_NAME = "Wurst"
-    const val CLIENT_AUTHOR = "CCBlueX"
+    const val CLIENT_NAME = "Rape"
+    const val CLIENT_AUTHOR = "reality"
     const val CLIENT_CLOUD = "https://cloud.liquidbounce.net/LiquidBounce"
 
-    val clientVersion = gitInfo["git.build.version"]?.toString() ?: "unknown"
-    val clientCommit = gitInfo["git.commit.id.abbrev"]?.let { "git-$it" } ?: "unknown"
+    val clientVersion = "V4" // gitInfo["git.build.version"]?.toString() ?: "unknown"
+    val clientCommit = "0" //gitInfo["git.commit.id.abbrev"]?.let { "git-$it" } ?: "unknown"
     val clientBranch = gitInfo["git.branch"]?.toString() ?: "nextgen"
 
     /**

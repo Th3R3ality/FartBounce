@@ -1,4 +1,4 @@
-<img class="watermark" src="img/wurst-logo.png" alt="watermark" />
+<img class="watermark" src="img/logo.png" alt="watermark" />
 
 <style lang="scss">
     .watermark {

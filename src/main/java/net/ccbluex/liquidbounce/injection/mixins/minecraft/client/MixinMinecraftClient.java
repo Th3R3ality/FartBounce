@@ -156,12 +156,11 @@ public abstract class MixinMinecraftClient {
         LiquidBounce.INSTANCE.getLogger().debug("Modifying window title");
 
         StringBuilder titleBuilder = new StringBuilder(LiquidBounce.CLIENT_NAME);
-        titleBuilder.append(" premium");
-        // titleBuilder.append(LiquidBounce.INSTANCE.getClientVersion());
         titleBuilder.append(" ");
+        titleBuilder.append(LiquidBounce.INSTANCE.getClientVersion());
 
         if (LiquidBounce.IN_DEVELOPMENT) {
-            titleBuilder.append("(dev)");
+            titleBuilder.append(" (dev)");
         }
 
         // titleBuilder.append(LiquidBounce.INSTANCE.getClientCommit());

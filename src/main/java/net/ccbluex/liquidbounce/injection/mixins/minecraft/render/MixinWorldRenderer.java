@@ -163,7 +163,7 @@ public abstract class MixinWorldRenderer {
     private void injectChamsForEntity(Entity entity, double cameraX, double cameraY, double cameraZ, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, CallbackInfo ci) {
         if (ModuleChams.INSTANCE.getEnabled() && CombatExtensionsKt.getCombatTargetsConfigurable().shouldShow(entity)) {
             glEnable(GL_POLYGON_OFFSET_FILL);
-            glPolygonOffset(1f, -1000000F);
+            glPolygonOffset(1f, -10000F);
 
             this.isRenderingChams = true;
         }
@@ -172,7 +172,7 @@ public abstract class MixinWorldRenderer {
     @Inject(method = "renderEntity", at = @At("RETURN"))
     private void injectChamsForEntityPost(Entity entity, double cameraX, double cameraY, double cameraZ, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, CallbackInfo ci) {
         if (ModuleChams.INSTANCE.getEnabled() && CombatExtensionsKt.getCombatTargetsConfigurable().shouldShow(entity) && this.isRenderingChams) {
-            glPolygonOffset(1f, 1000000F);
+            glPolygonOffset(1f, 10000F);
             glDisable(GL_POLYGON_OFFSET_FILL);
 
             this.isRenderingChams = false;

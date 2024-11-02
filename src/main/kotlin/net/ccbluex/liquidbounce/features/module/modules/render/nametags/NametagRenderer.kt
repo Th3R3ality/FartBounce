@@ -61,7 +61,7 @@ class NametagRenderer {
     ) = with(env) {
         val c = Fonts.DEFAULT_FONT_SIZE.toFloat()
 
-        val scale = 1.0F / (c * 0.15F) * ModuleNametags.scale
+        val scale = (1.0F / (c * 0.15F) * ModuleNametags.scale)
 
         matrixStack.push()
         matrixStack.translate(pos.x, pos.y, pos.z)

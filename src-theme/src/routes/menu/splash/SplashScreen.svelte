@@ -2,7 +2,7 @@
     import {fade} from "svelte/transition";
 </script>
 
-<img class="logo" src="img/wurst-logo.png" alt="logo" out:fade|global={{duration: 250}}>
+<img class="logo" src="img/logo.png" alt="logo" out:fade|global={{duration: 250}}>
 
 <style lang="scss">
   .logo {

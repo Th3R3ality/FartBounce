@@ -61,8 +61,7 @@ internal object FlyVulcan286MC18 : Choice("Vulcan286-18") {
     override fun enable() {
         flags = 0
         flagPos = null
-        //chat(regular(message("vulcanGhostOldMessage")))
-        chat("Get wurst at WiZARDHAX.COM")
+        chat(regular(message("vulcanGhostOldMessage")))
     }
 
     val tickHandler = handler<PlayerTickEvent> {
