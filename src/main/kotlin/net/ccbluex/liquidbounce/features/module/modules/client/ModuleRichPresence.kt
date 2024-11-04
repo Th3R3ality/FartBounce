@@ -53,17 +53,18 @@ data class IpcConfiguration(
 
 val ipcConfiguration by lazy {
     logger.info("Loading Discord IPC configuration...")
-    decode<IpcConfiguration>(HttpClient.get("$CLIENT_CLOUD/discord.json"))
+//    decode<IpcConfiguration>(HttpClient.get("$CLIENT_CLOUD/discord.json"))
+    IpcConfiguration(1302960317290123335, mapOf("icon" to "xray"))
 }
 
 object ModuleRichPresence : Module("RichPresence", Category.CLIENT, state = true, hide = true,
     aliases = arrayOf("DiscordPresence")) {
 
-    private val detailsText by text("Details", "Nextgen v%clientVersion% by %clientAuthor%")
-    private val stateText by text("State", "%enabledModules% of %totalModules% modules enabled")
+    private val detailsText by text("Details", "%clientName%%clientVersion% by %clientAuthor%")
+    private val stateText by text("State", "")
 
-    private val largeImageText by text("LargeImage", "Online with %protocol%")
-    private val smallImageText by text("SmallImage", "%clientBranch% (%clientCommit%)")
+//    private val largeImageText by text("LargeImage", "")
+//    private val smallImageText by text("SmallImage", "")
 
     // IPC Client
     private var ipcClient: IPCClient? = null
@@ -144,28 +145,30 @@ object ModuleRichPresence : Module("RichPresence", Category.CLIENT, state = true
             builder.setStartTimestamp(timestamp)
 
             // Check assets contains logo and set logo
-            if ("logo" in ipcConfiguration.assets) {
-                builder.setLargeImage(ipcConfiguration.assets["logo"], formatText(largeImageText))
-            }
+//            if ("logo" in ipcConfiguration.assets) {
+//                builder.setLargeImage(ipcConfiguration.assets["logo"], formatText(largeImageText))
+//            }
 
-            if ("smallLogo" in ipcConfiguration.assets) {
-                builder.setSmallImage(ipcConfiguration.assets["smallLogo"], formatText(smallImageText))
-            }
+            builder.setLargeImage(ipcConfiguration.assets["logo"], "")
+
+//            if ("smallLogo" in ipcConfiguration.assets) {
+//                builder.setSmallImage(ipcConfiguration.assets["smallLogo"], formatText(smallImageText))
+//            }
 
             builder.setDetails(formatText(detailsText))
             builder.setState(formatText(stateText))
 
-            builder.setButtons(JsonArray().apply {
-                add(JsonObject().apply {
-                    addProperty("label", "Download")
-                    addProperty("url", "https://liquidbounce.net/")
-                })
-
-                add(JsonObject().apply {
-                    addProperty("label", "GitHub")
-                    addProperty("url", "https://github.com/CCBlueX/LiquidBounce")
-                })
-            })
+//            builder.setButtons(JsonArray().apply {
+//                add(JsonObject().apply {
+//                    addProperty("label", "Download")
+//                    addProperty("url", "https://liquidbounce.net/")
+//                })
+//
+//                add(JsonObject().apply {
+//                    addProperty("label", "GitHub")
+//                    addProperty("url", "https://github.com/CCBlueX/LiquidBounce")
+//                })
+//            })
 
             ipcClient?.sendRichPresence(builder.build())
         }
