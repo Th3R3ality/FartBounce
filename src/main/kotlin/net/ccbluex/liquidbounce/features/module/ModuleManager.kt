@@ -338,6 +338,7 @@ object ModuleManager : Listenable, Iterable<Module> by modules {
             ModuleRealityTranspose,
             ModuleRealitySilentTP,
             ModuleRealityAutoFocus,
+            ModuleRealityStaffDetector,
 
             // Client
             ModuleAutoConfig,
