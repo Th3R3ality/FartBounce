@@ -98,6 +98,7 @@ class NametagRenderer {
 
     }
 
+    @Suppress("NestedBlockDepth", "CognitiveComplexMethod", "LongMethod", "MaxLineLength")
     private fun drawItemList(
         env: RenderEnvironment,
         pos: Vec3,
@@ -181,8 +182,9 @@ class NametagRenderer {
 
                 var enchantCount: Int = 0
                 fun drawItemEnchant(identifier: String, level: Int) {
-                    if (level < 1)
+                    if (level < 1) {
                         return
+                    }
 
                     val str = if (ModuleNametags.items.showEnchants.capitalEnchants) {
                         identifier.uppercase() + level.toString()
@@ -190,10 +192,10 @@ class NametagRenderer {
                         identifier.lowercase() + level.toString()
                     }
 
-                    val _text = ModuleNametags.fontRenderer.process(str)
+                    val text = ModuleNametags.fontRenderer.process(str)
 
                     ModuleNametags.fontRenderer.draw(
-                        _text,
+                        text,
                         scale(leftX),
                         scale(ITEM_SIZE / 5) - ModuleNametags.fontRenderer.height - ModuleNametags.fontRenderer.height * enchantCount,
                         shadow = true,

@@ -75,6 +75,7 @@ import org.apache.logging.log4j.LogManager
  *
  * @author kawaiinekololis (@team CCBlueX)
  */
+@Suppress("MayBeConst")
 object LiquidBounce : Listenable {
 
     /**

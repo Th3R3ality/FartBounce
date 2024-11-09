@@ -52,7 +52,8 @@ object ModuleTracers : Module("Tracers", Category.RENDER) {
             arrayOf(
                 DistanceColor,
                 GenericStaticColorMode(it, Color4b(0, 160, 255, 255)),
-                GenericRainbowColorMode(it)
+                GenericRainbowColorMode(it),
+                GenericEntityHealthColorMode(it)
             )
         }
     )

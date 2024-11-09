@@ -26,8 +26,4 @@ object ModuleRealitySilentTP : Module("SilentTranspose", Category.REALITY, ) {
             chat("Please enable Dimension Walk™ before transposing")
         }
     }
-
-    override fun disable(){
-
-    }
 }

@@ -128,7 +128,7 @@ class NametagTextFormatter(private val entity: Entity) {
 
             val absorptionAmount = entity.absorptionAmount.toInt()
 
-            if (!(absorptionAmount > 0)) {return regular("")}
+            if (!(absorptionAmount > 0)) return regular("")
 
             val absorptionColor = Formatting.GOLD
 
