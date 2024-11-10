@@ -162,12 +162,14 @@
             })
         }, 100);
     });
+
+
 </script>
 
 <svelte:window on:mouseup={onMouseUp} on:mousemove={onMouseMove}/>
 
 <div
-        class="panel"
+        class="panel" id="panel"
         style="left: {panelConfig.left}px; top: {panelConfig.top}px; z-index: {panelConfig.zIndex};"
         bind:this={panelElement}
 >
@@ -193,7 +195,7 @@
         </button>
     </div>
 
-    <div class="modules" on:scroll={handleModulesScroll} bind:this={modulesElement}>
+    <div class="modules" id="modules" on:scroll={handleModulesScroll} bind:this={modulesElement}>
         {#each renderedModules as {name, enabled, description, aliases} (name)}
             <Module {name} {enabled} {description} {aliases}/>
         {/each}

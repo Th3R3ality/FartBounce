@@ -79,7 +79,7 @@
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
-        class="module"
+        class="module" id="module"
         class:expanded
         class:has-settings={configurable?.value.length > 2}
 >

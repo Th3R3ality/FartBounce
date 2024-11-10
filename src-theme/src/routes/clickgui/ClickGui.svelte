@@ -10,6 +10,7 @@
     import {listen} from "../../integration/ws";
     import type {ClickGuiScaleChangeEvent, ScaleFactorChangeEvent} from "../../integration/events";
     import {scaleFactor} from "./clickgui_store";
+    import {addToTimer, getTimerTime, gradientScale, gradientSpeed, HSVtoRGB} from "../../reality";
 
     let categories: GroupedModules = {};
     let modules: Module[] = [];
@@ -28,6 +29,7 @@
 
         const clickGuiSettings = await getModuleSettings("ClickGUI");
         clickGuiScaleFactor = clickGuiSettings.value.find(v => v.name === "Scale")?.value as number ?? 1
+        setInterval(updateModuleColors, 10);
     });
 
     listen("scaleFactorChange", (e: ScaleFactorChangeEvent) => {
@@ -37,6 +39,33 @@
     listen("clickGuiScaleChange", (e: ClickGuiScaleChangeEvent) => {
         clickGuiScaleFactor = e.value;
     });
+
+    function updateModuleColors() {
+        const panels = document.getElementsByClassName("panel");
+        if (panels == null) return;
+
+        for (let i = 0; i < panels.length; i++) {
+            const panel = panels[i];
+
+            const modules = panel.lastElementChild?.children as HTMLCollectionOf<HTMLElement>;
+
+            for (let i = 0; i < modules.length; i++) {
+                const module = modules[i].firstChild as HTMLElement;
+                if (module.className.includes("enabled")) {
+                    module.style.color = "#1a191a"
+                    const rgb = HSVtoRGB(getTimerTime() + i * gradientScale, 0.7, 1);
+                    module.style.background = `rgb( ${rgb.r}, ${rgb.g}, ${rgb.b})`;
+                    const darkrgb = HSVtoRGB(getTimerTime() + i * gradientScale, 0.7, 0.5);
+                    module.style.borderBottomColor = `rgb( ${darkrgb.r}, ${darkrgb.g}, ${darkrgb.b})`;
+                }
+                else
+                {
+                    module.style = ""
+                }
+            }
+        }
+        addToTimer(gradientSpeed);
+    }
 </script>
 
 <div class="clickgui" transition:fade|global={{duration: 200}}
