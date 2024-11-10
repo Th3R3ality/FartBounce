@@ -69,7 +69,7 @@
   }
 
   .head {
-    background-color: $accent-color;
+    background-color: $clickgui-text-dimmed-color;
     padding: 6px 10px;
     cursor: pointer;
     display: flex;
@@ -80,7 +80,7 @@
 
     .text {
       font-weight: 500;
-      color: $clickgui-text-color;
+      color: $clickgui-base-color;
       font-size: 12px;
       overflow: hidden;
       text-overflow: ellipsis;

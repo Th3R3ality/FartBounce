@@ -37,9 +37,14 @@
         await updateEnabledModules();
     });
 
+
     onMount(async () => {
         await updateEnabledModules();
-        setInterval(arraylistGradient, 10);
+
+        if (window.arraylistGradientTimer == null) {
+            setInterval(arraylistGradient, 10);
+            window.arraylistGradientTimer = true;
+        }
     });
 
     listen("toggleModule", async () => {
@@ -123,6 +128,7 @@
   .arraylist {
     font-family: "Proxima Nova", sans-serif;
     font-weight: 400;
+    transform: translate(-15px, 22px);
     //position: fixed;
     //top: 0;
     //right: 0;

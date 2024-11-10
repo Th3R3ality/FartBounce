@@ -29,7 +29,11 @@
 
         const clickGuiSettings = await getModuleSettings("ClickGUI");
         clickGuiScaleFactor = clickGuiSettings.value.find(v => v.name === "Scale")?.value as number ?? 1
-        setInterval(updateModuleColors, 10);
+
+        if (window.clickguiGradientTimer == null) {
+            setInterval(updateModuleColors, 10);
+            window.clickguiGradientTimer = true;
+        }
     });
 
     listen("scaleFactorChange", (e: ScaleFactorChangeEvent) => {

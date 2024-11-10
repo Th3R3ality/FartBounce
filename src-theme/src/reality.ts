@@ -1,4 +1,4 @@
-let timer = 0
+let timer = 10
 
 export const gradientScale = -0.05
 export const gradientSpeed = 0.002

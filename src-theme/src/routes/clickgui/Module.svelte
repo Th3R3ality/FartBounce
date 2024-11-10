@@ -168,6 +168,7 @@
         border-style: solid;
         border-bottom-color: darken($clickgui-module-enabled-color, 10%);
         border-width: 0 0 1px 0;
+        text-shadow: 0 0 1px black;
 
         .expand-toggle{
           background-image: url("/img/clickgui/icon-expand-dark.png");
