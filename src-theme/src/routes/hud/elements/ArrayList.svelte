@@ -61,6 +61,7 @@
         {
             const watermarkColor = HSVtoRGB(getTimerTime(), 0.7, 1);
             const filter = getFilterFromColor(`${watermarkColor.r}, ${watermarkColor.g}, ${watermarkColor.b}`);
+            // noinspection JSConstantReassignment,TypeScriptValidateTypes
             watermark.style = filter; // false error
         }
 

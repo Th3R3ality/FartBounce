@@ -60,6 +60,7 @@
                 }
                 else
                 {
+                    // noinspection JSConstantReassignment,TypeScriptValidateTypes
                     module.style = ""
                 }
             }
