@@ -32,45 +32,21 @@ data class NametagInfo(
     /**
      * The items that should be rendered above the name tag
      */
-    val hands: List<ItemStack?>,
-    val equipped: List<ItemStack?>,
+    val items: List<ItemStack?>,
 ) {
     companion object {
         fun createForEntity(entity: Entity): NametagInfo {
             val text = NametagTextFormatter(entity).format()
-            val hands = createHandsItemList(entity)
-            val equipped = createArmorItemList(entity)
+            val items = createItemList(entity)
 
-            return NametagInfo(text, hands, equipped)
+            return NametagInfo(text, items)
         }
 
         /**
          * Creates a list of items that should be rendered above the name tag. Currently, it is the item in main hand,
          * the item in off-hand (as long as it exists) and the armor items.
          */
-        // private fun createItemList(entity: Entity): List<ItemStack?> {
-        //     if (entity !is LivingEntity) {
-        //         return emptyList()
-        //     }
-
-        //     val itemIterator = entity.handItems.iterator()
-
-        //     val firstHandItem = itemIterator.next()
-        //     val secondHandItem = itemIterator.next()
-
-        //     val armorItems = entity.armorItems
-
-        //     val heldItems =
-        //         if (secondHandItem.isNothing()) {
-        //             listOf(firstHandItem)
-        //         } else {
-        //             listOf(firstHandItem, secondHandItem)
-        //         }
-
-        //     return heldItems + armorItems
-        // }
-
-        private fun createHandsItemList(entity: Entity): List<ItemStack?>{
+        private fun createItemList(entity: Entity): List<ItemStack?> {
             if (entity !is LivingEntity) {
                 return emptyList()
             }
@@ -80,23 +56,16 @@ data class NametagInfo(
             val firstHandItem = itemIterator.next()
             val secondHandItem = itemIterator.next()
 
-            var heldItems =
+            val armorItems = entity.armorItems
+
+            val heldItems =
                 if (secondHandItem.isNothing()) {
                     listOf(firstHandItem)
                 } else {
                     listOf(firstHandItem, secondHandItem)
-            }
+                }
 
-            return heldItems.filterNotNull().filterNot{ it.isEmpty() }.reversed()
-        }
-
-        private fun createArmorItemList(entity: Entity): List<ItemStack?>{
-            if (entity !is LivingEntity) {
-                return emptyList()
-            }
-            val equippedItems = entity.armorItems.asSequence().toList()
-
-            return equippedItems.filterNotNull().filterNot{ it.isEmpty() }.reversed()
+            return heldItems + armorItems
         }
     }
 }

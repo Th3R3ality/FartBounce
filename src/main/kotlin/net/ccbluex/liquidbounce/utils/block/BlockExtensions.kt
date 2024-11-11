@@ -18,9 +18,8 @@
  */
 package net.ccbluex.liquidbounce.utils.block
 
-import it.unimi.dsi.fastutil.ints.IntObjectImmutablePair
+import it.unimi.dsi.fastutil.booleans.BooleanObjectPair
 import it.unimi.dsi.fastutil.ints.IntObjectPair
-import it.unimi.dsi.fastutil.doubles.DoubleObjectImmutablePair
 import it.unimi.dsi.fastutil.doubles.DoubleObjectPair
 import net.ccbluex.liquidbounce.config.NamedChoice
 import net.ccbluex.liquidbounce.event.EventManager
@@ -31,6 +30,8 @@ import net.ccbluex.liquidbounce.utils.client.*
 import net.ccbluex.liquidbounce.utils.entity.eyes
 import net.ccbluex.liquidbounce.utils.math.rangeTo
 import net.minecraft.block.*
+import net.minecraft.entity.Entity
+import net.minecraft.entity.decoration.EndCrystalEntity
 import net.minecraft.fluid.Fluids
 import net.minecraft.item.ItemPlacementContext
 import net.minecraft.item.ItemStack
@@ -160,37 +161,58 @@ fun BlockPos.searchBlocksInCuboid(radius: Int): Region {
 }
 
 /**
+ * Scan blocks outwards from a bed
+ */
+fun BlockPos.searchBedLayer(state: BlockState, layers: Int): Sequence<IntObjectPair<BlockPos>> {
+    check(state.block in BED_BLOCKS) { "This function is only available for Beds" }
+
+    val bedDirection = state.get(BedBlock.FACING)
+
+    var left = Direction.WEST
+    var right = Direction.EAST
+
+    if (bedDirection.axis == Direction.Axis.X) {
+        left = Direction.SOUTH
+        right = Direction.NORTH
+    }
+
+    val opposite = bedDirection.opposite
+
+    return searchLayer(layers, bedDirection, Direction.UP, left, right) +
+        offset(opposite).searchLayer(layers, opposite, Direction.UP, left, right)
+}
+
+/**
  * Scan blocks outwards from center along given [directions], up to [layers]
  */
 @Suppress("detekt:CognitiveComplexMethod")
 fun BlockPos.searchLayer(layers: Int, vararg directions: Direction): Sequence<IntObjectPair<BlockPos>> =
     sequence {
         val queue = ArrayDeque<IntObjectPair<BlockPos>>(layers * layers * directions.size / 2).apply {
-            add(IntObjectImmutablePair(0, this@searchLayer))
+            add(IntObjectPair.of(0, this@searchLayer))
         }
         val visited = hashSetOf(this@searchLayer)
+        val mutable = BlockPos.Mutable()
 
         while (queue.isNotEmpty()) {
             val current = queue.removeFirst()
 
             val layer = current.keyInt()
 
-            if (layer == layers) {
-                continue
-            }
-
-            if (layer > 0) {
-                yield(current)
+            when {
+                layer > layers -> continue
+                layer > 0 -> yield(current)
             }
 
             val pos = current.value()
 
             for (direction in directions) {
-                val newPos = pos.offset(direction)
+                mutable.set(pos, direction)
 
-                if (newPos !in visited && getManhattanDistance(newPos) <= layers) {
+                if (mutable !in visited) {
+                    val newPos = mutable.toImmutable()
                     visited.add(newPos)
-                    queue.add(IntObjectImmutablePair(layer + 1, newPos))
+                    queue.add(IntObjectPair.of(layer + 1, newPos))
                 }
             }
         }
@@ -205,9 +227,13 @@ fun BlockPos.getSphere(radius: Float): Sequence<DoubleObjectPair<BlockPos>> = se
     searchBlocksInCuboid(MathHelper.ceil(radius)).forEach {
         val distanceSq = getSquaredDistance(it)
         if (distanceSq <= radiusSq) {
-            yield(DoubleObjectImmutablePair(distanceSq, it.toImmutable()))
+            yield(DoubleObjectPair.of(distanceSq, it.toImmutable()))
         }
     }
+}
+
+fun BlockPos.getSortedSphere(radius: Float): Array<BlockPos> {
+    return getSphere(radius).toList().sortedBy { it.firstDouble() }.map { it.second() }.toTypedArray()
 }
 
 /**
@@ -545,6 +571,32 @@ fun BlockPos.isBlockedByEntities(): Boolean {
     return world.entities.any {
         it.boundingBox.intersects(FULL_BOX.offset(this.x.toDouble(), this.y.toDouble(), this.z.toDouble()))
     }
+}
+
+inline fun BlockPos.getBlockingEntities(include: (Entity) -> Boolean = { true }): List<Entity> {
+    return world.entities.filter {
+        it.boundingBox.intersects(FULL_BOX.offset(this.x.toDouble(), this.y.toDouble(), this.z.toDouble())) &&
+            include.invoke(it)
+    }
+}
+
+/**
+ * Like [isBlockedByEntities] but it returns a blocking end crystal if present.
+ */
+fun BlockPos.isBlockedByEntitiesReturnCrystal(): BooleanObjectPair<EndCrystalEntity?> {
+    var blocked = false
+
+    world.entities.forEach {
+        if (it.boundingBox.intersects(FULL_BOX.offset(this.x.toDouble(), this.y.toDouble(), this.z.toDouble()))) {
+            if (it is EndCrystalEntity) {
+                return BooleanObjectPair.of(true, it)
+            }
+
+            blocked = true
+        }
+    }
+
+    return BooleanObjectPair.of(blocked, null)
 }
 
 val BED_BLOCKS = setOf(
