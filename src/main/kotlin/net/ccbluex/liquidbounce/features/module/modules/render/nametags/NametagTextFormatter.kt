@@ -37,6 +37,7 @@ import net.minecraft.util.Formatting
 import kotlin.math.roundToInt
 
 class NametagTextFormatter(private val entity: Entity) {
+    @Suppress("MaxLineLength", "BracesOnIfStatements")
     fun format(): Text {
         val outputText = Text.empty()
 
@@ -73,6 +74,7 @@ class NametagTextFormatter(private val entity: Entity) {
 
     private val isBot = ModuleAntiBot.isBot(entity)
 
+    @Suppress("UnusedPrivateProperty")
     private val nameColor: TextColor
         get() {
             val tagColor = EntityTaggingManager.getTag(this.entity).color

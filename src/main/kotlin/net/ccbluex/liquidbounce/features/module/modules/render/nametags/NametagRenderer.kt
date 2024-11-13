@@ -96,6 +96,7 @@ class NametagRenderer {
 
     }
 
+    @Suppress("CognitiveComplexMethod", "MaxLineLength")
     private fun drawItemList(
         env: RenderEnvironment,
         pos: Vec3,
@@ -152,8 +153,9 @@ class NametagRenderer {
                 {
                     var enchantCount: Int = 0
                     fun drawItemEnchant(identifier: String, level: Int) {
-                        if (level < 1)
+                        if (level < 1) {
                             return
+                        }
 
                         val str = if (ModuleNametags.ShowOptions.items.enchants.capitalised) {
                             identifier.uppercase() + level.toString()
@@ -162,6 +164,7 @@ class NametagRenderer {
                         }
 
                         val text = ModuleNametags.fontRenderer.process(str)
+
 
                         ModuleNametags.fontRenderer.draw(
                             text,

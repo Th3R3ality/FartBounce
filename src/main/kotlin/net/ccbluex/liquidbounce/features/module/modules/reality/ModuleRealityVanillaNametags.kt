@@ -23,6 +23,7 @@ import net.minecraft.util.Formatting
 
 object ModuleRealityVanillaNametags : Module("VanillaNametags", Category.REALITY) {
 
+    @Suppress("LongParameterList", "CognitiveComplexMethod", "FunctionNaming", "MaxLineLength")
     fun RenderLabel(entity: Entity, text: Text, matrices: MatrixStack, vertexConsumers: VertexConsumerProvider, light: Int, tickDelta: Float, textRenderer: TextRenderer, dispatcher: EntityRenderDispatcher) {
         var text: MutableText = text as MutableText;
 
