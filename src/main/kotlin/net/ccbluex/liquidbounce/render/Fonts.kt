@@ -46,8 +46,8 @@ object Fonts {
 
     const val DEFAULT_FONT_SIZE: Int = 43
     val FONT_FORMATS = arrayOf("Regular", "Bold", "Italic", "BoldItalic")
-    val DEFAULT_FONT = FontInfo("Montserrat")
-        .queueLoad()
+    val DEFAULT_FONT = FontInfo("Montserrat").queueLoad()
+    val MINECRAFT_FONT = FontInfo("Minecraft").queueLoad()
 
     fun loadQueuedFonts() {
         while (fontQueue.isNotEmpty()) {

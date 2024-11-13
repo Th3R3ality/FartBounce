@@ -23,14 +23,17 @@ import net.ccbluex.liquidbounce.render.*
 import net.ccbluex.liquidbounce.render.engine.Color4b
 import net.ccbluex.liquidbounce.render.engine.Vec3
 import net.ccbluex.liquidbounce.render.engine.font.FontRendererBuffers
+import net.ccbluex.liquidbounce.utils.client.asText
 import net.ccbluex.liquidbounce.utils.client.mc
+import net.ccbluex.liquidbounce.utils.item.toRegistryEntry
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.render.VertexFormat
+import net.minecraft.enchantment.Enchantments
 import net.minecraft.item.ItemStack
 import org.lwjgl.opengl.GL11
 
 private const val NAMETAG_PADDING: Int = 5
-private const val ITEM_SIZE: Int = 20
+private const val ITEM_SIZE: Int = 16
 private const val ITEM_SCALE: Float = 1.0F
 
 class NametagRenderer {
@@ -76,8 +79,8 @@ class NametagRenderer {
 
         ModuleNametags.fontRenderer.commit(env, fontBuffers)
 
-        val q1 = Vec3(-0.1F * c, ModuleNametags.fontRenderer.height * -0.1F, 0.0F)
-        val q2 = Vec3(x + 0.2F * c, ModuleNametags.fontRenderer.height * 1.1F, 0.0F)
+        val q1 = Vec3(-0.2F * c, ModuleNametags.fontRenderer.height * -0.1F, 0.0F)
+        val q2 = Vec3(x + 0.1F * c, ModuleNametags.fontRenderer.height * 0.9F, 0.0F)
 
         quadBuffers.drawQuad(env, q1, q2)
 
@@ -85,36 +88,103 @@ class NametagRenderer {
             lineBuffers.drawQuadOutlines(env, q1, q2)
         }
 
-        if (ModuleNametags.ShowOptions.items) {
-            drawItemList(pos, info.items)
+        matrixStack.pop()
+
+        if (ModuleNametags.ShowOptions.items.enabled) {
+            drawItemList(env, pos, info.items)
         }
 
-        matrixStack.pop()
     }
 
     private fun drawItemList(
+        env: RenderEnvironment,
         pos: Vec3,
         itemsToRender: List<ItemStack?>,
-    ) {
+    ) = with(env) {
         val dc = DrawContext(mc, mc.bufferBuilders.entityVertexConsumers)
 
+        val width = itemsToRender.size * ITEM_SIZE
+        val height = ITEM_SIZE
+        val itemScale = ITEM_SCALE * ModuleNametags.scale
+
         dc.matrices.translate(pos.x, pos.y - NAMETAG_PADDING, pos.z)
-        dc.matrices.scale(ITEM_SCALE * ModuleNametags.scale, ITEM_SCALE * ModuleNametags.scale, 1.0F)
-        dc.matrices.translate(-itemsToRender.size * ITEM_SIZE / 2.0F, -ITEM_SIZE.toFloat(), 0.0F)
+        dc.matrices.scale(itemScale, itemScale, 1.0F)
+        dc.matrices.translate(-width / 2.0F, -height.toFloat(), 0.0F)
 
         dc.fill(
             0,
             0,
-            itemsToRender.size * ITEM_SIZE,
-            ITEM_SIZE,
+            width,
+            height,
             Color4b.BLACK.alpha(0).toARGB()
         )
 
         dc.matrices.translate(0.0F, 0.0F, 100.0F)
 
+        val c = ModuleNametags.fontRenderer.size
+        val fontScale = 1.0F / (c * 0.15F) * ModuleNametags.scale
+        fun scale(f: Int) = f * itemScale / fontScale
+
+        matrixStack.push()
+        matrixStack.translate(pos.x, pos.y, pos.z)
+        matrixStack.scale(fontScale, fontScale, 1.0F)
+        matrixStack.translate(-scale(width) / 2 - ITEM_SIZE / 2, -scale(height) - ITEM_SIZE / 2, pos.z)
+
         itemsToRender.forEachIndexed { index, itemStack ->
-            dc.drawItem(itemStack, index * ITEM_SIZE, 0)
+            val leftX = index * ITEM_SIZE
+
+            dc.drawItem(itemStack, leftX, 0)
+
+            if (itemStack != null) {
+
+                if (ModuleNametags.ShowOptions.items.count && itemStack.count > 1)
+                {
+                    val text = ModuleNametags.fontRenderer.process(itemStack.count.toString().asText())
+                    ModuleNametags.fontRenderer.draw(
+                        text,
+                        scale(leftX + ITEM_SIZE) - ModuleNametags.fontRenderer.getStringWidth(text),
+                        scale(ITEM_SIZE - ITEM_SIZE/4) - ModuleNametags.fontRenderer.size,
+                        shadow = true,
+                    )
+                }
+
+                if (ModuleNametags.ShowOptions.items.enchants.enabled)
+                {
+                    var enchantCount: Int = 0
+                    fun drawItemEnchant(identifier: String, level: Int) {
+                        if (level < 1)
+                            return
+
+                        val str = if (ModuleNametags.ShowOptions.items.enchants.capitalised) {
+                            identifier.uppercase() + level.toString()
+                        } else {
+                            identifier.lowercase() + level.toString()
+                        }
+
+                        val text = ModuleNametags.fontRenderer.process(str)
+
+                        ModuleNametags.fontRenderer.draw(
+                            text,
+                            scale(leftX),
+                            scale(ITEM_SIZE / 4) - ModuleNametags.fontRenderer.size - ModuleNametags.fontRenderer.height * enchantCount,
+                            shadow = true,
+                        )
+                        enchantCount++
+                    }
+
+                    val enchants = itemStack.enchantments
+
+                    drawItemEnchant("P", enchants.getLevel(Enchantments.PROTECTION.toRegistryEntry()))
+                    drawItemEnchant("S", enchants.getLevel(Enchantments.SHARPNESS.toRegistryEntry()))
+                    drawItemEnchant("KB", enchants.getLevel(Enchantments.KNOCKBACK.toRegistryEntry()))
+
+                }
+
+            }
         }
+
+        ModuleNametags.fontRenderer.commit(fontBuffers)
+        matrixStack.pop()
     }
 
     fun commit(env: RenderEnvironment) {
@@ -128,6 +198,8 @@ class NametagRenderer {
             GL11.GL_ONE,
             GL11.GL_ZERO
         )
+
+
 
         env.withColor(Color4b(0, 0, 0, 120)) {
             quadBuffers.draw()

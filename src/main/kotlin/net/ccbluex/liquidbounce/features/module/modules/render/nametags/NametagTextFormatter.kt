@@ -47,12 +47,21 @@ class NametagTextFormatter(private val entity: Entity) {
             outputText.append(this.pingText).append(" ")
         }
 
-        val nameString = entity.displayName!!.sanitizeWithNameProtect().string
+        val nameString = entity.displayName!!.sanitizeWithNameProtect()
 
-        outputText.append(nameString.asText().styled { it.withColor(this.nameColor) })
+
+
+        if (!entity.isSneaking)
+            outputText.append(nameString)
+        else
+            outputText.append(nameString.string.asText().styled { it.withColor(Formatting.RED) })
 
         if (ModuleNametags.ShowOptions.health) {
-            outputText.append(" ").append(this.healthText)
+            outputText.append(this.healthText)
+        }
+
+        if (ModuleNametags.ShowOptions.absorption) {
+            outputText.append(this.absorptionText)
         }
 
         if (this.isBot) {
@@ -116,7 +125,24 @@ class NametagTextFormatter(private val entity: Entity) {
                 else -> Formatting.RED
             }
 
-            return withColor("$actualHealth HP", healthColor)
+            return withColor(" $actualHealth", healthColor)
+
+        }
+
+    private val absorptionText: Text
+        get() {
+            if (entity !is LivingEntity) {
+                return regular("")
+            }
+
+            val absorptionAmount = entity.absorptionAmount.toInt()
+
+            if (absorptionAmount < 1)
+            {
+                return regular("")
+            }
+
+            return withColor(" $absorptionAmount", Formatting.GOLD)
 
         }
 }

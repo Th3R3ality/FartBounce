@@ -19,6 +19,7 @@
 package net.ccbluex.liquidbounce.features.module.modules.render.nametags
 
 import net.ccbluex.liquidbounce.config.Configurable
+import net.ccbluex.liquidbounce.config.ToggleableConfigurable
 import net.ccbluex.liquidbounce.event.events.OverlayRenderEvent
 import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.features.module.Category
@@ -47,9 +48,25 @@ object ModuleNametags : Module("Nametags", Category.RENDER) {
      */
     object ShowOptions : Configurable("Show") {
         val health by boolean("Health", true)
-        val distance by boolean("Distance", true)
-        val ping by boolean("Ping", true)
-        val items by boolean("Items", true)
+        val absorption by boolean("Absorption", true)
+        val distance by boolean("Distance", false)
+        val ping by boolean("Ping", false)
+
+        object items : ToggleableConfigurable(ModuleNametags, "Items", true) {
+            val count by boolean("ItemCount", true)
+
+            object enchants : ToggleableConfigurable(this, "Enchants", true) {
+                val capitalised by boolean("Capitalised", true)
+            }
+
+            init {
+                tree(enchants)
+            }
+        }
+
+        init {
+            tree(items)
+        }
     }
 
     init {
@@ -61,7 +78,8 @@ object ModuleNametags : Module("Nametags", Category.RENDER) {
     private val maximumDistance by float("MaximumDistance", 100F, 1F..256F)
 
     val fontRenderer by lazy {
-        Fonts.DEFAULT_FONT.get()
+        Fonts.MINECRAFT_FONT.get()
+        //Fonts.DEFAULT_FONT.get()
     }
 
     @Suppress("unused")
