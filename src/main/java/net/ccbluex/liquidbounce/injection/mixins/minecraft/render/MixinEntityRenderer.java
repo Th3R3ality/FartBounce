@@ -19,6 +19,7 @@
 
 package net.ccbluex.liquidbounce.injection.mixins.minecraft.render;
 
+import net.ccbluex.liquidbounce.features.module.modules.reality.ModuleRealityVanillaNametags;
 import net.ccbluex.liquidbounce.features.module.modules.render.ModuleCombineMobs;
 import net.ccbluex.liquidbounce.features.module.modules.render.ModuleMobOwners;
 import net.ccbluex.liquidbounce.features.module.modules.render.nametags.ModuleNametags;
@@ -30,8 +31,11 @@ import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityAttachmentType;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.Vec3d;
 import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -41,6 +45,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import static net.ccbluex.liquidbounce.utils.client.ClientUtilsKt.regular;
 
 @Mixin(EntityRenderer.class)
 public abstract class MixinEntityRenderer<T extends Entity> {
@@ -99,9 +105,15 @@ public abstract class MixinEntityRenderer<T extends Entity> {
 
     @Inject(method = "renderLabelIfPresent", at = @At("HEAD"), cancellable = true)
     private void disableDuplicateNametagsAndInjectMobOwners(T entity, Text text, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, float tickDelta, CallbackInfo ci) {
-        // Don't render nametags
         if (ModuleNametags.INSTANCE.getEnabled() && ModuleNametags.shouldRenderNametag(entity)) {
             ci.cancel();
+            return;
+        }
+
+        if (ModuleRealityVanillaNametags.INSTANCE.getEnabled() && ModuleRealityVanillaNametags.shouldRenderNametag(entity)) {
+            ModuleRealityVanillaNametags.INSTANCE.RenderLabel(entity, text, matrices, vertexConsumers, light, tickDelta, this.getTextRenderer(), this.dispatcher);
+            ci.cancel();
+            return;
         }
     }
 
