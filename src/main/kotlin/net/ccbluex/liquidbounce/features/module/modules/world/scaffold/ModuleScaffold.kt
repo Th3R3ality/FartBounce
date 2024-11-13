@@ -19,7 +19,6 @@
 package net.ccbluex.liquidbounce.features.module.modules.world.scaffold
 
 import it.unimi.dsi.fastutil.ints.IntObjectPair
-import net.ccbluex.liquidbounce.config.Choice
 import net.ccbluex.liquidbounce.config.NamedChoice
 import net.ccbluex.liquidbounce.config.NoneChoice
 import net.ccbluex.liquidbounce.config.ToggleableConfigurable
@@ -39,7 +38,10 @@ import net.ccbluex.liquidbounce.features.module.modules.world.scaffold.ModuleSca
 import net.ccbluex.liquidbounce.features.module.modules.world.scaffold.ModuleScaffold.ScaffoldRotationConfigurable.rotationTiming
 import net.ccbluex.liquidbounce.features.module.modules.world.scaffold.ScaffoldBlockItemSelection.isValidBlock
 import net.ccbluex.liquidbounce.features.module.modules.world.scaffold.features.*
-import net.ccbluex.liquidbounce.features.module.modules.world.scaffold.techniques.*
+import net.ccbluex.liquidbounce.features.module.modules.world.scaffold.techniques.ScaffoldBreezilyTechnique
+import net.ccbluex.liquidbounce.features.module.modules.world.scaffold.techniques.ScaffoldExpandTechnique
+import net.ccbluex.liquidbounce.features.module.modules.world.scaffold.techniques.ScaffoldGodBridgeTechnique
+import net.ccbluex.liquidbounce.features.module.modules.world.scaffold.techniques.ScaffoldNormalTechnique
 import net.ccbluex.liquidbounce.features.module.modules.world.scaffold.techniques.normal.ScaffoldDownFeature
 import net.ccbluex.liquidbounce.features.module.modules.world.scaffold.techniques.normal.ScaffoldEagleFeature
 import net.ccbluex.liquidbounce.features.module.modules.world.scaffold.tower.ScaffoldTowerKarhu
@@ -100,7 +102,7 @@ object ModuleScaffold : Module("Scaffold", Category.WORLD) {
         tree(ScaffoldMovementPrediction)
     }
 
-    internal val technique = choices<ScaffoldTechnique>(
+    internal val technique = choices(
         "Technique",
         ScaffoldNormalTechnique,
         arrayOf(
@@ -109,7 +111,7 @@ object ModuleScaffold : Module("Scaffold", Category.WORLD) {
             ScaffoldGodBridgeTechnique,
             ScaffoldBreezilyTechnique
         )
-    ).apply { tagBy(this) }
+    ).apply(::tagBy)
 
     private val sameYMode by enumChoice("SameY", SameYMode.OFF)
 
@@ -149,9 +151,7 @@ object ModuleScaffold : Module("Scaffold", Category.WORLD) {
     }
 
     @Suppress("UnusedPrivateProperty")
-    val towerMode = choices<Choice>("Tower", {
-        it.choices[0] // None
-    }) {
+    val towerMode = choices("Tower", 0) {
         arrayOf(NoneChoice(it), ScaffoldTowerMotion, ScaffoldTowerPulldown, ScaffoldTowerKarhu, ScaffoldTowerVulcan)
     }
 
@@ -160,9 +160,7 @@ object ModuleScaffold : Module("Scaffold", Category.WORLD) {
 
     // SafeWalk feature - uses the SafeWalk module as a base
     @Suppress("unused")
-    private val safeWalkMode = choices("SafeWalk", {
-        it.choices[1] // Safe mode
-    }, ModuleSafeWalk::createChoices)
+    private val safeWalkMode = choices("SafeWalk", 1, ModuleSafeWalk::safeWalkChoices)
 
     internal object ScaffoldRotationConfigurable : RotationsConfigurable(this) {
 
@@ -429,8 +427,8 @@ object ModuleScaffold : Module("Scaffold", Category.WORLD) {
         val currentRotation = if ((rotationTiming == ON_TICK || rotationTiming == ON_TICK_SNAP) && target != null) {
             target.rotation
         } else {
-            RotationManager.serverRotation
-        }
+            RotationManager.currentRotation ?: player.rotation
+        }.normalize()
         val currentCrosshairTarget = technique.activeChoice.getCrosshairTarget(target, currentRotation)
         val currentDelay = delay.random()
 
@@ -481,21 +479,22 @@ object ModuleScaffold : Module("Scaffold", Category.WORLD) {
             if (currentRotation != RotationManager.serverRotation) {
                 network.sendPacket(
                     Full(
-                        player.x, player.y, player.z, currentRotation.yaw, currentRotation.pitch,
+                        player.x, player.y, player.z,
+                        currentRotation.yaw,
+                        currentRotation.pitch,
                         player.isOnGround
                     )
                 )
+            }
 
-                if (rotationTiming == ON_TICK_SNAP) {
-                    RotationManager.aimAt(
-                        currentRotation,
-                        considerInventory = considerInventory,
-                        configurable = ScaffoldRotationConfigurable,
-                        provider = this@ModuleScaffold,
-                        priority = Priority.IMPORTANT_FOR_PLAYER_LIFE
-                    )
-                }
-
+            if (rotationTiming == ON_TICK_SNAP) {
+                RotationManager.aimAt(
+                    currentRotation,
+                    considerInventory = considerInventory,
+                    configurable = ScaffoldRotationConfigurable,
+                    provider = this@ModuleScaffold,
+                    priority = Priority.IMPORTANT_FOR_PLAYER_LIFE
+                )
             }
         }
 
@@ -514,8 +513,7 @@ object ModuleScaffold : Module("Scaffold", Category.WORLD) {
         if (rotationTiming == ON_TICK && RotationManager.serverRotation != player.rotation) {
             network.sendPacket(
                 Full(
-                    player.x, player.y, player.z, player.withFixedYaw(currentRotation),
-                    player.pitch, player.isOnGround
+                    player.x, player.y, player.z, player.withFixedYaw(currentRotation), player.pitch, player.isOnGround
                 )
             )
         }
@@ -572,6 +570,10 @@ object ModuleScaffold : Module("Scaffold", Category.WORLD) {
     internal fun getTargetedPosition(blockPos: BlockPos): BlockPos {
         if (ScaffoldDownFeature.handleEvents() && ScaffoldDownFeature.shouldGoDown) {
             return blockPos.add(0, -2, 0)
+        }
+
+        if (ScaffoldCeilingFeature.canConstructCeiling() && ScaffoldCeilingFeature.enabled) {
+            return blockPos.add(0, 3, 0)
         }
 
         if (!isTowering) {

@@ -45,7 +45,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.Pair;
 import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -97,7 +96,7 @@ public abstract class MixinPlayerEntity extends MixinLivingEntity {
 
         RotationManager rotationManager = RotationManager.INSTANCE;
         Rotation rotation = rotationManager.getCurrentRotation();
-        AimPlan configurable = rotationManager.getStoredAimPlan();
+        AimPlan configurable = rotationManager.getWorkingAimPlan();
 
         if (configurable == null || !configurable.getApplyVelocityFix() || rotation == null) {
             return original;
@@ -189,12 +188,13 @@ public abstract class MixinPlayerEntity extends MixinLivingEntity {
             return original;
         }
 
-        Pair<Float, Float> pitch = ModuleRotations.INSTANCE.getRotationPitch();
         ModuleRotations rotations = ModuleRotations.INSTANCE;
+        final var pitch = rotations.getRotationPitch();
         Rotation rotation = rotations.displayRotations();
 
         // Update pitch here
-        rotations.setRotationPitch(new Pair<>(pitch.getRight(), rotation.getPitch()));
+        pitch.key(pitch.valueFloat());
+        pitch.value(rotation.getPitch());
 
         return rotations.shouldDisplayRotations() && rotations.getBodyParts().getHead() ? rotation.getYaw() : original;
     }
@@ -212,9 +212,7 @@ public abstract class MixinPlayerEntity extends MixinLivingEntity {
     @WrapWithCondition(method = "attack", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;setSprinting(Z)V", ordinal = 0))
     private boolean hookSlowVelocity(PlayerEntity instance, boolean b) {
         if ((Object) this == MinecraftClient.getInstance().player) {
-            if (ModuleKeepSprint.INSTANCE.getEnabled() && !b) {
-                return false;
-            }
+            return !ModuleKeepSprint.INSTANCE.getEnabled() || b;
         }
 
         return true;
