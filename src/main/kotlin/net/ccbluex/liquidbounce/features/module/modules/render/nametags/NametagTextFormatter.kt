@@ -41,10 +41,10 @@ class NametagTextFormatter(private val entity: Entity) {
         val outputText = Text.empty()
 
         if (ModuleNametags.ShowOptions.distance) {
-            outputText.append(this.distanceText).append(" ")
+            outputText.append(this.distanceText).append(Text.literal(" ").styled { it.withFormatting(Formatting.RESET) })
         }
         if (ModuleNametags.ShowOptions.ping) {
-            outputText.append(this.pingText).append(" ")
+            outputText.append(this.pingText).append(withColor("", Formatting.RESET))
         }
 
         val nameString = entity.displayName!!.sanitizeWithNameProtect()
@@ -107,7 +107,7 @@ class NametagTextFormatter(private val entity: Entity) {
                 else -> Formatting.GREEN
             }
 
-            return regular(" [") + withColor(playerPing.toString() + "ms", coloringBasedOnPing) + regular("]")
+            return regular("[") + withColor(playerPing.toString() + "ms", coloringBasedOnPing) + regular("] ")
         }
 
     private val healthText: Text

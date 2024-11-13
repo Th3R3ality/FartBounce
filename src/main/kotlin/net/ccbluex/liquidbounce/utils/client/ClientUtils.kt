@@ -42,7 +42,7 @@ val inGame: Boolean
 // Chat formatting
 private val clientPrefix = Text.empty()
     .styled { it.withFormatting(Formatting.RESET) }.styled { it.withFormatting(Formatting.WHITE) }
-    .append(Text.literal("Rape")
+    .append(Text.literal("Rape ")
         .styled { it.withColor(Formatting.DARK_GRAY) })
     .append(Text.literal(":")
         .styled { it.withFormatting(Formatting.OBFUSCATED) }.styled { it.withColor(Formatting.BLACK) })
