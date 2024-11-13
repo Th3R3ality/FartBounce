@@ -45,9 +45,7 @@ import java.awt.Color
 
 object ModuleTracers : Module("Tracers", Category.RENDER) {
 
-    private val modes = choices<GenericColorMode<LivingEntity>>(
-        "ColorMode",
-        { DistanceColor },
+    private val modes = choices("ColorMode", 0)
         {
             arrayOf(
                 DistanceColor,
@@ -56,7 +54,7 @@ object ModuleTracers : Module("Tracers", Category.RENDER) {
                 GenericEntityHealthColorMode(it)
             )
         }
-    )
+
 
     private object DistanceColor : GenericColorMode<LivingEntity>("Distance") {
         override val parent: ChoiceConfigurable<*>
