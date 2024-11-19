@@ -47,9 +47,9 @@ object ModuleRealityAutoFocus : Module("AutoFocus", Category.REALITY) {
             TextColor.fromFormatting(Formatting.BLACK),
             TextColor.fromFormatting(Formatting.DARK_GRAY),
             TextColor.fromFormatting(Formatting.GRAY),
-            TextColor.fromFormatting(Formatting.WHITE),
-            TextColor.fromFormatting(Formatting.AQUA),
-            TextColor.fromFormatting(Formatting.DARK_AQUA) -> return false
+            TextColor.fromFormatting(Formatting.WHITE) -> return false
+            //TextColor.fromFormatting(Formatting.AQUA),
+            //TextColor.fromFormatting(Formatting.DARK_AQUA)
         }
 
 //        chat("targetting [" + entity.displayName!!.string + "]")
