@@ -64,6 +64,8 @@ object ModuleNametags : Module("Nametags", Category.RENDER) {
             }
         }
 
+        val nodark by boolean("NoDarkNames", true)
+
         init {
             tree(items)
         }

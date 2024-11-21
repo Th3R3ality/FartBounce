@@ -30,7 +30,9 @@ import net.ccbluex.liquidbounce.utils.entity.ping
 import net.minecraft.entity.Entity
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.scoreboard.Team
 import net.minecraft.text.MutableText
+import net.minecraft.text.Style
 import net.minecraft.text.Text
 import net.minecraft.text.TextColor
 import net.minecraft.util.Formatting
@@ -48,15 +50,30 @@ class NametagTextFormatter(private val entity: Entity) {
             outputText.append(this.pingText).append(withColor("", Formatting.RESET))
         }
 
-        val nameString = entity.displayName!!.sanitizeWithNameProtect()
+        //val nameString = entity.displayName!!.sanitizeWithNameProtect()
+        //return Team.decorateName(this.getScoreboardTeam(), this.getName()).styled { style: Style ->
+        //    style.withHoverEvent(this.getHoverEvent()).withInsertion(this.getUuidAsString())
+        //}
 
+        var nameString = Team.decorateName(entity.scoreboardTeam, entity.name)
 
+        if (ModuleNametags.ShowOptions.nodark)
+        {
+            when (nameString.style.color)
+            {
+                TextColor.fromFormatting(Formatting.BLACK),
+                TextColor.fromFormatting(Formatting.DARK_GRAY),
+                TextColor.fromFormatting(Formatting.GRAY),
+                TextColor.fromFormatting(Formatting.WHITE) -> nameString.style = nameString.style.withColor(Formatting.WHITE.toTextColor())
+            }
+        }
 
-        if (!entity.isSneaking)
-            outputText.append(nameString)
-        else
-            outputText.append(nameString.string.asText().styled { it.withColor(Formatting.RED) })
+        nameString = nameString!!.sanitizeWithNameProtect() as MutableText
 
+        if (entity.isSneaking) {
+            nameString.style = nameString.style.withColor(Formatting.DARK_RED)
+        }
+        outputText.append(nameString)
         if (ModuleNametags.ShowOptions.health) {
             outputText.append(this.healthText)
         }
