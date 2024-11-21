@@ -15,6 +15,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with LiquidBounce. If not, see <https://www.gnu.org/licenses/>.
+ *
+ *
  */
 package net.ccbluex.liquidbounce.features.module.modules.combat.crystalaura
 
@@ -139,8 +141,6 @@ object SubmoduleCrystalPlacer : ToggleableConfigurable(ModuleCrystalAura, "Place
                 swingMode
             )
 
-            SubmoduleIdPredict.run(targetPos)
-
             chronometer.reset()
         })
     }
@@ -164,7 +164,7 @@ object SubmoduleCrystalPlacer : ToggleableConfigurable(ModuleCrystalAura, "Place
         val wallsRange = wallsRange.toDouble()
 
         val target = ModuleCrystalAura.currentTarget ?: return
-        val maxY = target.boundingBox.maxY
+        val maxX = target.boundingBox.maxX
 
         val positions = mutableListOf<ObjectObjectImmutablePair<BlockPos, Boolean>>()
 
@@ -177,7 +177,7 @@ object SubmoduleCrystalPlacer : ToggleableConfigurable(ModuleCrystalAura, "Place
             if ((state.block == Blocks.OBSIDIAN || state.block == Blocks.BEDROCK) &&
                 pos.up().getState()!!.isAir &&
                 canSeeUpperBlockSide &&
-                pos.y.toDouble() + 1.0 < maxY
+                pos.x.toDouble() + 1.0 < maxX
             ) {
                 val blocked = pos.up().isBlockedByEntitiesReturnCrystal()
 

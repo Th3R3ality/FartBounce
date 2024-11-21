@@ -24,14 +24,11 @@ import net.ccbluex.liquidbounce.config.ToggleableConfigurable
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.Module
 import net.ccbluex.liquidbounce.features.module.modules.combat.ModuleCriticals
-import net.ccbluex.liquidbounce.features.module.modules.combat.killaura.ModuleKillAura
 import net.ccbluex.liquidbounce.features.module.modules.movement.fly.ModuleFly
 import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.SpeedCustom
 import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.SpeedLegitHop
 import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.SpeedSpeedYPort
 import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.grim.SpeedGrimCollide
-import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.hylex.SpeedHylexGround
-import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.hylex.SpeedHylexLowHop
 import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.intave.SpeedIntave14
 import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.ncp.SpeedNCP
 import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.sentinel.SpeedSentinelDamage
@@ -45,7 +42,6 @@ import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.wat
 import net.ccbluex.liquidbounce.features.module.modules.movement.speed.modes.watchdog.SpeedHypixelLowHop
 import net.ccbluex.liquidbounce.features.module.modules.world.scaffold.ModuleScaffold
 import net.ccbluex.liquidbounce.utils.client.inGame
-import net.ccbluex.liquidbounce.utils.combat.CombatManager
 
 /**
  * Speed module
@@ -85,10 +81,7 @@ object ModuleSpeed : Module("Speed", Category.MOVEMENT) {
 
         SpeedNCP(configurable),
 
-        SpeedIntave14(configurable),
-
-        SpeedHylexLowHop(configurable),
-        SpeedHylexGround(configurable)
+        SpeedIntave14(configurable)
     )
 
     val modes = choices("Mode", 0, this::initializeSpeeds).apply(::tagBy)
@@ -96,30 +89,6 @@ object ModuleSpeed : Module("Speed", Category.MOVEMENT) {
     private val notDuringScaffold by boolean("NotDuringScaffold", true)
     private val notDuringFly by boolean("NotDuringFly", true)
     private val notWhileSneaking by boolean("NotWhileSneaking", false)
-
-    private object OnlyInCombat : ToggleableConfigurable(this, "OnlyInCombat", false) {
-
-        val modes = choices(this, "Mode", { it.choices[0] },
-            ModuleSpeed::initializeSpeeds)
-
-        override fun handleEvents(): Boolean {
-            // We cannot use our parent super.handleEvents() here, because it has been turned false
-            // when [OnlyInCombat] is enabled
-            if (!ModuleSpeed.enabled || !enabled || !inGame || !passesRequirements()) {
-                return false
-            }
-
-            // Only On Potion Effect has a higher priority
-            if (OnlyOnPotionEffect.handleEvents()) {
-                return false
-            }
-
-            return CombatManager.isInCombat ||
-                (ModuleKillAura.enabled && ModuleKillAura.targetTracker.lockedOnTarget != null)
-        }
-
-    }
-
     private object OnlyOnPotionEffect : ToggleableConfigurable(this, "OnlyOnPotionEffect", false) {
 
         val potionEffects = choices(
@@ -129,8 +98,7 @@ object ModuleSpeed : Module("Speed", Category.MOVEMENT) {
             arrayOf(SpeedPotionEffectChoice, SlownessPotionEffectChoice, BothEffectsChoice)
         )
 
-        val modes = choices(this, "Mode", { it.choices[0] },
-            ModuleSpeed::initializeSpeeds)
+        val modes = choices(this, "Mode", { it.choices[0] }, ModuleSpeed::initializeSpeeds)
 
         override fun handleEvents(): Boolean {
             // We cannot use our parent super.handleEvents() here, because it has been turned false
@@ -145,7 +113,6 @@ object ModuleSpeed : Module("Speed", Category.MOVEMENT) {
     }
 
     init {
-        tree(OnlyInCombat)
         tree(OnlyOnPotionEffect)
     }
 
@@ -157,11 +124,6 @@ object ModuleSpeed : Module("Speed", Category.MOVEMENT) {
         }
 
         if (!passesRequirements()) {
-            return false
-        }
-
-        // We do not want to handle events if the OnlyInCombat is enabled
-        if (OnlyInCombat.enabled && OnlyInCombat.handleEvents()) {
             return false
         }
 

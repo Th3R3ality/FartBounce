@@ -59,15 +59,10 @@ object ModuleESP : Module("ESP", Category.RENDER) {
 
     private val friendColor by color("Friends", Color4b(0, 0, 255))
 
-    abstract class EspMode(
-        name: String,
-        val requiresTrueSight: Boolean = false
-    ) : Choice(name) {
-        override val parent
-            get() = modes
-    }
+    private object BoxMode : Choice("Box") {
 
-    private object BoxMode : EspMode("Box") {
+        override val parent: ChoiceConfigurable<Choice>
+            get() = modes
 
         private val outline by boolean("Outline", true)
 
@@ -102,15 +97,23 @@ object ModuleESP : Module("ESP", Category.RENDER) {
                     }
                 }
             }
+
         }
+    }
+
+    fun findRenderedEntities() = world.entities.filterIsInstance<LivingEntity>().filter { it.shouldBeShown() }
+
+    object GlowMode : Choice("Glow") {
+
+        override val parent: ChoiceConfigurable<Choice>
+            get() = modes
 
     }
 
-    object GlowMode : EspMode("Glow", requiresTrueSight = true)
-
-    object OutlineMode : EspMode("Outline", requiresTrueSight = true)
-
-    fun findRenderedEntities() = world.entities.filterIsInstance<LivingEntity>().filter { it.shouldBeShown() }
+    object OutlineMode : Choice("Outline") {
+        override val parent: ChoiceConfigurable<Choice>
+            get() = modes
+    }
 
     private fun getBaseColor(entity: LivingEntity): Color4b {
         if (entity is PlayerEntity) {
@@ -133,8 +136,4 @@ object ModuleESP : Module("ESP", Category.RENDER) {
 
         return baseColor
     }
-
-    fun requiresTrueSight(entity: LivingEntity) =
-        modes.activeChoice.requiresTrueSight && entity.shouldBeShown()
-
 }

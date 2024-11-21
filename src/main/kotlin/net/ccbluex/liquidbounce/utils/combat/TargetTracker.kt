@@ -39,7 +39,7 @@ import net.minecraft.entity.player.PlayerEntity
  */
 open class TargetTracker(
     defaultPriority: PriorityEnum = PriorityEnum.HEALTH,
-    maxRange: Float? = null
+    rangeOption: Boolean = false
 ) : Configurable("Target") {
 
     var range = Double.MAX_VALUE
@@ -52,8 +52,8 @@ open class TargetTracker(
     private val priority by enumChoice("Priority", defaultPriority)
 
     init {
-        if (maxRange != null) {
-            float("Range", 4.5f, 1f..maxRange).onChanged { range = it.toDouble() }
+        if (rangeOption) {
+            float("Range", 4.5f, 1f..12f).onChanged { range = it.toDouble() }
             range = 4.5
         }
     }

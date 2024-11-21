@@ -54,9 +54,7 @@ object ModuleBacktrack : Module("Backtrack", Category.COMBAT) {
     private val delay by intRange("Delay", 100..150, 0..1000, "ms")
     private val nextBacktrackDelay by intRange("NextBacktrackDelay", 0..10, 0..2000, "ms")
     private val chance by float("Chance", 50f, 0f..100f, "%")
-    private val espMode = choices("EspMode", Wireframe, arrayOf(Box, Model, Wireframe, None)).apply {
-        doNotIncludeAlways()
-    }
+    val renderMode = choices("RenderMode", Box, arrayOf(Box, Model, Wireframe, None))
 
     private val packetQueue = LinkedHashSet<DelayData>()
     private val chronometer = Chronometer()
@@ -64,8 +62,7 @@ object ModuleBacktrack : Module("Backtrack", Category.COMBAT) {
     private var target: Entity? = null
     private var position: TrackedPosition? = null
 
-    @Suppress("unused")
-    private val packetHandler = handler<PacketEvent> {
+    val packetHandler = handler<PacketEvent> {
         if (packetQueue.isNotEmpty()) {
             chronometer.waitForAtLeast(nextBacktrackDelay.random().toLong())
         }
@@ -146,12 +143,11 @@ object ModuleBacktrack : Module("Backtrack", Category.COMBAT) {
 
     object Box : RenderChoice("Box") {
         override val parent: ChoiceConfigurable<RenderChoice>
-            get() = espMode
+            get() = renderMode
 
         private val color by color("Color", Color4b(36, 32, 147, 87))
 
-        @Suppress("unused")
-        private val renderHandler = handler<WorldRenderEvent> { event ->
+        val renderHandler = handler<WorldRenderEvent> { event ->
             val (entity, pos) = getEntityPosition() ?: return@handler
 
             val dimensions = entity.getDimensions(entity.pose)
@@ -171,12 +167,11 @@ object ModuleBacktrack : Module("Backtrack", Category.COMBAT) {
 
     object Model : RenderChoice("Model") {
         override val parent: ChoiceConfigurable<RenderChoice>
-            get() = espMode
+            get() = renderMode
 
         private val lightAmount by float("LightAmount", 0.3f, 0.01f..1f)
 
-        @Suppress("unused")
-        private val renderHandler = handler<WorldRenderEvent> { event ->
+        val renderHandler = handler<WorldRenderEvent> { event ->
             val (entity, pos) = getEntityPosition() ?: return@handler
 
             val light = world.getLightLevel(BlockPos.ORIGIN)
@@ -202,13 +197,12 @@ object ModuleBacktrack : Module("Backtrack", Category.COMBAT) {
 
     object Wireframe : RenderChoice("Wireframe") {
         override val parent: ChoiceConfigurable<RenderChoice>
-            get() = espMode
+            get() = renderMode
 
         private val color by color("Color", Color4b(36, 32, 147, 87))
         private val outlineColor by color("OutlineColor", Color4b(36, 32, 147, 255))
 
-        @Suppress("unused")
-        private val renderHandler = handler<WorldRenderEvent> {
+        val renderHandler = handler<WorldRenderEvent> {
             val (entity, pos) = getEntityPosition() ?: return@handler
 
             val wireframePlayer = WireframePlayer(pos, entity.yaw, entity.pitch)
@@ -218,7 +212,7 @@ object ModuleBacktrack : Module("Backtrack", Category.COMBAT) {
 
     object None : RenderChoice("None") {
         override val parent: ChoiceConfigurable<RenderChoice>
-            get() = espMode
+            get() = renderMode
     }
 
     /**
@@ -234,8 +228,7 @@ object ModuleBacktrack : Module("Backtrack", Category.COMBAT) {
      *
      * That gets called first, then the client's packets.
      */
-    @Suppress("unused")
-    private val tickHandler = handler<GameTickEvent>(priority = 1002) {
+    val tickHandler = handler<GameTickEvent>(priority = 1002) {
         if (shouldCancelPackets()) {
             processPackets()
         } else {
@@ -244,7 +237,7 @@ object ModuleBacktrack : Module("Backtrack", Category.COMBAT) {
     }
 
     @Suppress("unused")
-    private val worldChangeHandler = handler<WorldChangeEvent> {
+    val worldChangeHandler = handler<WorldChangeEvent> {
         // Clear packets on disconnect only
         if (it.world == null) {
             clear(clearOnly = true)
@@ -252,12 +245,11 @@ object ModuleBacktrack : Module("Backtrack", Category.COMBAT) {
     }
 
     @Suppress("unused")
-    private val attackHandler = handler<AttackEvent> {
+    val attackHandler = handler<AttackEvent> {
         val enemy = it.enemy
 
-        if (!shouldBacktrack(enemy)) {
+        if (!shouldBacktrack(enemy))
             return@handler
-        }
 
         // Reset on enemy change
         if (enemy != target) {

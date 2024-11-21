@@ -19,10 +19,12 @@
 package net.ccbluex.liquidbounce.features.module.modules.world
 
 import net.ccbluex.liquidbounce.event.events.MouseButtonEvent
+import net.ccbluex.liquidbounce.event.events.WorldRenderEvent
 import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.event.repeatable
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.Module
+import net.ccbluex.liquidbounce.render.*
 import net.ccbluex.liquidbounce.render.engine.Color4b
 import net.ccbluex.liquidbounce.utils.aiming.RotationManager
 import net.ccbluex.liquidbounce.utils.aiming.RotationsConfigurable
@@ -31,7 +33,7 @@ import net.ccbluex.liquidbounce.utils.client.Chronometer
 import net.ccbluex.liquidbounce.utils.entity.eyes
 import net.ccbluex.liquidbounce.utils.item.findHotbarSlot
 import net.ccbluex.liquidbounce.utils.kotlin.Priority
-import net.ccbluex.liquidbounce.utils.render.placement.PlacementRenderer
+import net.ccbluex.liquidbounce.utils.math.toVec3d
 import net.minecraft.block.BlockState
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket
@@ -50,24 +52,13 @@ object ModuleCivBreak : Module("CivBreak", Category.WORLD) {
     private val ignoreOpenInventory by boolean("IgnoreOpenInventory", true)
     private val rotationsConfigurable = tree(RotationsConfigurable(this))
     private val switch by boolean("Switch", false)
-    private val targetRenderer = tree(
-        PlacementRenderer("TargetRendering", true, this,
-            defaultColor = Color4b(255, 0, 0, 90)
-        )
-    )
+    private val color by color("Color", Color4b(0, 100, 255))
 
-    private val chronometer = Chronometer()
-    private var pos: BlockPos? = null
-        set(value) {
-            field?.let { targetRenderer.removeBlock(it) }
-            value?.let { targetRenderer.addBlock(it) }
+    val chronometer = Chronometer()
+    var pos: BlockPos? = null
+    var dir: Direction? = null
 
-            field = value
-        }
-    private var dir: Direction? = null
-
-    @Suppress("unused")
-    private val repeatable = repeatable {
+    val repeatable = repeatable {
         if (pos == null || dir == null) {
             return@repeatable
         }
@@ -127,8 +118,7 @@ object ModuleCivBreak : Module("CivBreak", Category.WORLD) {
         )
     }
 
-    @Suppress("unused")
-    private val packetHandler = handler<MouseButtonEvent> { event ->
+    val packetHandler = handler<MouseButtonEvent> { event ->
         val isLeftClick = event.button == 0
         // without adding a little delay before being able to unselect / select again, selecting would be impossible
         val hasTimePassed = chronometer.hasElapsed(200)
@@ -151,6 +141,23 @@ object ModuleCivBreak : Module("CivBreak", Category.WORLD) {
         }
 
         chronometer.reset()
+    }
+
+    // render
+    @Suppress("unused")
+    val renderHandler = handler<WorldRenderEvent> { event ->
+        val matrixStack = event.matrixStack
+        if (pos == null || dir == null) {
+            return@handler
+        }
+
+        renderEnvironmentForWorld(matrixStack) {
+            withPositionRelativeToCamera(pos!!.toVec3d()) {
+                withColor(color) {
+                    drawOutlinedBox(FULL_BOX)
+                }
+            }
+        }
     }
 
     override fun disable() {

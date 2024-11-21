@@ -28,7 +28,6 @@ import net.ccbluex.liquidbounce.features.module.modules.player.invcleaner.ItemSl
 import net.ccbluex.liquidbounce.utils.inventory.*
 import net.ccbluex.liquidbounce.utils.item.ArmorPiece
 import net.ccbluex.liquidbounce.utils.item.isNothing
-import net.ccbluex.liquidbounce.utils.kotlin.Priority
 import net.minecraft.item.Items
 
 /**
@@ -53,11 +52,7 @@ object ModuleAutoArmor : Module("AutoArmor", Category.COMBAT) {
         }
 
         for (armorPiece in armorToEquip) {
-            event.schedule(
-                inventoryConstraints,
-                equipArmorPiece(armorPiece) ?: continue,
-                Priority.IMPORTANT_FOR_PLAYER_LIFE
-            )
+            event.schedule(inventoryConstraints, equipArmorPiece(armorPiece) ?: continue)
         }
     }
 

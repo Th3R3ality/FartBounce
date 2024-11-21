@@ -21,7 +21,6 @@ package net.ccbluex.liquidbounce.features.command.commands.client
 import net.ccbluex.liquidbounce.config.ConfigSystem
 import net.ccbluex.liquidbounce.config.ValueType
 import net.ccbluex.liquidbounce.features.command.builder.CommandBuilder
-import net.ccbluex.liquidbounce.features.module.modules.render.ModuleClickGui
 import net.ccbluex.liquidbounce.utils.client.chat
 import net.ccbluex.liquidbounce.utils.client.regular
 import net.ccbluex.liquidbounce.utils.combat.TargetConfigurable
@@ -78,8 +77,6 @@ object CommandTargets {
                             "disabled"
                         }
                         chat(regular(command.result(localizedState)))
-
-                        ModuleClickGui.reloadView()
                         ConfigSystem.storeConfigurable(combatTargetsConfigurable)
                     }
                     .build()

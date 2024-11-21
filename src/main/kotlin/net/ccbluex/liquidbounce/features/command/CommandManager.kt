@@ -90,8 +90,6 @@ object CommandExecutor : Listenable {
 
 }
 
-private val commands = mutableListOf<Command>()
-
 /**
  * Contains routines for handling commands
  * and the command registry
@@ -99,7 +97,9 @@ private val commands = mutableListOf<Command>()
  * @author superblaubeere27 (@team CCBlueX)
  */
 
-object CommandManager : Iterable<Command> by commands {
+object CommandManager : Iterable<Command> {
+
+    internal val commands = mutableListOf<Command>()
 
     object Options : Configurable("Commands") {
         /**
@@ -134,7 +134,6 @@ object CommandManager : Iterable<Command> by commands {
         addCommand(CommandBinds.createCommand())
         addCommand(CommandClear.createCommand())
         addCommand(CommandHide.createCommand())
-        addCommand(CommandInvsee.createCommand())
         addCommand(CommandItems.createCommand())
         addCommand(CommandPanic.createCommand())
         addCommand(CommandValue.createCommand())
@@ -427,6 +426,8 @@ object CommandManager : Iterable<Command> by commands {
         return Pair(output, outputIndices)
     }
 
+    override fun iterator() = commands.iterator()
+
     fun autoComplete(origCmd: String, start: Int): CompletableFuture<Suggestions> {
         if (HideAppearance.isDestructed) {
             return Suggestions.empty()
@@ -464,7 +465,7 @@ object CommandManager : Iterable<Command> by commands {
             val pair = getSubCommand(args)
 
             if (args.size == 1 && (pair == null || !nextParameter)) {
-                for (command in commands) {
+                for (command in this.commands) {
                     if (command.name.startsWith(args[0], true)) {
                         builder.suggest(command.name)
                     }

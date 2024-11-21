@@ -28,7 +28,6 @@ import net.ccbluex.liquidbounce.event.events.*
 import net.ccbluex.liquidbounce.event.handler
 import net.ccbluex.liquidbounce.utils.client.logger
 import net.ccbluex.liquidbounce.utils.client.mc
-import net.ccbluex.liquidbounce.utils.kotlin.getValue
 import net.minecraft.block.BlockState
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.chunk.WorldChunk
@@ -39,11 +38,6 @@ object ChunkScanner : Listenable {
     private val subscribers = CopyOnWriteArrayList<BlockChangeSubscriber>()
 
     private val loadedChunks = hashSetOf<ChunkLocation>()
-
-    private fun clearAllChunks() {
-        subscribers.forEach(BlockChangeSubscriber::clearAllChunks)
-        loadedChunks.clear()
-    }
 
     @Suppress("unused")
     val chunkLoadHandler = handler<ChunkLoadEvent> { event ->
@@ -78,13 +72,9 @@ object ChunkScanner : Listenable {
     }
 
     @Suppress("unused")
-    val worldChangeHandler = handler<WorldChangeEvent> { event ->
-        clearAllChunks()
-    }
-
-    @Suppress("unused")
     val disconnectHandler = handler<DisconnectEvent> {
-        clearAllChunks()
+        subscribers.forEach(BlockChangeSubscriber::clearAllChunks)
+        loadedChunks.clear()
     }
 
     fun subscribe(newSubscriber: BlockChangeSubscriber) {
@@ -118,11 +108,6 @@ object ChunkScanner : Listenable {
 
     object ChunkScannerThread {
         private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
-
-        /**
-         * Shared cache for CoroutineScope
-         */
-        private val mutable by ThreadLocal.withInitial(BlockPos::Mutable)
 
         private const val CHANNEL_CAPACITY = 800
 
@@ -212,16 +197,17 @@ object ChunkScanner : Listenable {
 
             val start = System.nanoTime()
 
-            (chunk.bottomY..chunk.topY).map { y ->
+            (chunk.bottomY until chunk.topY).map { y ->
                 scope.launch {
-                    val startX = chunk.pos.startX
-                    val startZ = chunk.pos.startZ
-                    for (x in 0..15) {
-                        for (z in 0..15) {
-                            val pos = mutable.set(startX or x, y, startZ or z)
+                    val pos = BlockPos.Mutable(chunk.pos.startX, y, chunk.pos.startZ)
+                    repeat(16) {
+                        repeat(16) {
                             val blockState = chunk.getBlockState(pos)
                             subscribersForRecordBlock.forEach { it.recordBlock(pos, blockState, cleared = true) }
+                            pos.z++
                         }
+                        pos.z = chunk.pos.startZ
+                        pos.x++
                     }
                 }
             }.joinAll()

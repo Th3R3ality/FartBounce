@@ -34,7 +34,6 @@ import net.ccbluex.liquidbounce.features.module.modules.player.invcleaner.Hotbar
 import net.ccbluex.liquidbounce.features.module.modules.player.invcleaner.ItemSlot
 import net.ccbluex.liquidbounce.utils.client.*
 import net.ccbluex.liquidbounce.utils.kotlin.EventPriorityConvention
-import net.ccbluex.liquidbounce.utils.kotlin.Priority
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
 import net.minecraft.client.gui.screen.ingame.InventoryScreen
 import net.minecraft.item.ItemStack
@@ -102,11 +101,7 @@ object InventoryManager : Listenable {
             // 2. With inventory open required actions
             val schedule = event.schedule
                 .filter { actionChain -> actionChain.canPerformAction() && actionChain.actions.isNotEmpty() }
-                .groupBy(InventoryActionChain::requiresInventoryOpen)
-                .map { it.value.sortedByDescending { actionChain -> actionChain.priority } }
-                .reduceOrNull { acc, inventoryActionChains ->
-                    acc + inventoryActionChains
-                } ?: break
+                .sortedByDescending(InventoryActionChain::requiresInventoryOpen)
 
             // If the schedule is empty, we can break the loop
             if (schedule.isEmpty()) {
@@ -457,8 +452,7 @@ data class CreativeInventoryAction(
  */
 data class InventoryActionChain(
     val inventoryConstraints: InventoryConstraints,
-    val actions: Array<out InventoryAction>,
-    val priority: Priority
+    val actions: Array<out InventoryAction>
 ) {
 
     fun canPerformAction(): Boolean {

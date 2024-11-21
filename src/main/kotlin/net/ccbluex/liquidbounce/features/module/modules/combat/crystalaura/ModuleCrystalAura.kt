@@ -15,13 +15,15 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with LiquidBounce. If not, see <https://www.gnu.org/licenses/>.
+ *
+ *
  */
 package net.ccbluex.liquidbounce.features.module.modules.combat.crystalaura
 
 import net.ccbluex.liquidbounce.config.Configurable
-import net.ccbluex.liquidbounce.event.events.SimulatedTickEvent
 import net.ccbluex.liquidbounce.event.events.WorldRenderEvent
 import net.ccbluex.liquidbounce.event.handler
+import net.ccbluex.liquidbounce.event.repeatable
 import net.ccbluex.liquidbounce.features.misc.FriendManager
 import net.ccbluex.liquidbounce.features.module.Category
 import net.ccbluex.liquidbounce.features.module.Module
@@ -38,14 +40,9 @@ import net.minecraft.entity.LivingEntity
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Vec3d
 
-object ModuleCrystalAura : Module(
-    "CrystalAura",
-    Category.COMBAT,
-    aliases = arrayOf("AutoCrystal"),
-    disableOnQuit = true
-) {
+object ModuleCrystalAura : Module("CrystalAura", Category.COMBAT, disableOnQuit = true) {
 
-    val targetTracker = tree(TargetTracker(maxRange = 12f))
+    val targetTracker = tree(TargetTracker(rangeOption = true))
 
     object DamageOptions : Configurable("Damage") {
         val maxSelfDamage by float("MaxSelfDamage", 2.0F, 0.0F..10.0F)
@@ -59,8 +56,6 @@ object ModuleCrystalAura : Module(
         tree(SubmoduleCrystalPlacer)
         tree(SubmoduleCrystalDestroyer)
         tree(DamageOptions)
-        tree(SubmoduleIdPredict)
-        tree(SubmoduleSetDead)
     }
 
     private val targetRenderer = tree(WorldTargetRenderer(this))
@@ -79,26 +74,19 @@ object ModuleCrystalAura : Module(
 
     override fun disable() {
         SubmoduleCrystalPlacer.placementRenderer.clearSilently()
-        SubmoduleCrystalDestroyer.postAttackHandlers.forEach(CrystalPostAttackTracker::onToggle)
-    }
-
-    override fun enable() {
-        SubmoduleCrystalDestroyer.postAttackHandlers.forEach(CrystalPostAttackTracker::onToggle)
     }
 
     @Suppress("unused")
-    val simulatedTickHandler = handler<SimulatedTickEvent> {
+    val networkTickHandler = repeatable {
         cacheMap.clear()
         currentTarget = targetTracker.enemies().firstOrNull()
-        currentTarget ?: return@handler
+        currentTarget ?: return@repeatable
         // Make the crystal destroyer run
         SubmoduleCrystalDestroyer.tick()
         // Make the crystal placer run
         SubmoduleCrystalPlacer.tick()
-        if (!SubmoduleIdPredict.enabled) {
-            // Make the crystal destroyer run
-            SubmoduleCrystalDestroyer.tick()
-        }
+        // Make the crystal destroyer run
+        SubmoduleCrystalDestroyer.tick()
     }
 
     @Suppress("unused")

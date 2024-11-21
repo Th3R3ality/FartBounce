@@ -15,6 +15,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with LiquidBounce. If not, see <https://www.gnu.org/licenses/>.
+ *
+ *
  */
 package net.ccbluex.liquidbounce.features.module.modules.combat.crystalaura
 
@@ -32,13 +34,12 @@ import kotlin.math.max
 
 object SubmoduleCrystalDestroyer : ToggleableConfigurable(ModuleCrystalAura, "Destroy", true) {
 
-    val swing by boolean("Swing", true)
+    private val swing by boolean("Swing", true)
     private val delay by int("Delay", 0, 0..1000, "ms")
-    val range by float("Range", 4.5F, 1.0F..5.0F)
-    val wallsRange by float("WallsRange", 4.5F, 1.0F..5.0F)
+    private val range by float("Range", 4.5F, 1.0F..5.0F)
+    private val wallsRange by float("WallsRange", 4.5F, 1.0F..5.0F)
 
-    var postAttackHandlers = arrayOf(CrystalAuraSpeedDebugger, SubmoduleSetDead.CrystalTracker)
-    val chronometer = Chronometer()
+    private val chronometer = Chronometer()
     private var currentTarget: EndCrystalEntity? = null
 
     fun tick() {
@@ -77,7 +78,6 @@ object SubmoduleCrystalDestroyer : ToggleableConfigurable(ModuleCrystalAura, "De
             val target1 = currentTarget ?: return@rotate
 
             target1.attack(swing)
-            postAttackHandlers.forEach { it.attacked(target1.id) }
             chronometer.reset()
         })
     }

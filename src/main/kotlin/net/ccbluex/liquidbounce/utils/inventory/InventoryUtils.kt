@@ -34,12 +34,17 @@ import net.ccbluex.liquidbounce.utils.item.isNothing
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.block.Blocks
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
+import net.minecraft.component.DataComponentTypes
 import net.minecraft.component.type.DyedColorComponent
+import net.minecraft.item.ArmorItem
+import net.minecraft.item.ArmorMaterials
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket
 import net.minecraft.registry.Registries
 import net.minecraft.registry.tag.ItemTags
+import net.minecraft.util.Colors
+import net.minecraft.util.DyeColor
 import net.minecraft.util.Hand
 import kotlin.math.abs
 
@@ -212,12 +217,12 @@ fun findBlocksEndingWith(vararg targets: String) =
 /**
  * Get the color of the armor on the player
  */
-fun getArmorColor() = ARMOR_SLOTS.firstNotNullOfOrNull { slot ->
+fun getArmorColor() = ARMOR_SLOTS.mapNotNull { slot ->
     val itemStack = slot.itemStack
-    val color = itemStack.getArmorColor() ?: return@firstNotNullOfOrNull null
+    val color = itemStack.getArmorColor() ?: return@mapNotNull null
 
     Pair(slot, color)
-}
+}.firstOrNull()
 
 /**
  * Get the color of the armor on the item stack
@@ -226,7 +231,7 @@ fun getArmorColor() = ARMOR_SLOTS.firstNotNullOfOrNull { slot ->
  */
 fun ItemStack.getArmorColor(): Int? {
     return if (isIn(ItemTags.DYEABLE)) {
-        DyedColorComponent.getColor(this, -6265536) // #FFA06540
+        DyedColorComponent.getColor(this, -6265536)
     } else {
         null
     }

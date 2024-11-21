@@ -25,13 +25,13 @@ import net.ccbluex.liquidbounce.features.command.builder.ParameterBuilder
 import net.ccbluex.liquidbounce.features.command.builder.moduleParameter
 import net.ccbluex.liquidbounce.features.command.builder.pageParameter
 import net.ccbluex.liquidbounce.features.module.ModuleManager
-import net.ccbluex.liquidbounce.features.module.modules.render.ModuleClickGui
 import net.ccbluex.liquidbounce.utils.client.*
 import net.ccbluex.liquidbounce.utils.input.inputByName
 import net.ccbluex.liquidbounce.utils.input.keyList
 import net.ccbluex.liquidbounce.utils.input.mouseList
 import net.minecraft.client.util.InputUtil
 import net.minecraft.util.Formatting
+import org.lwjgl.glfw.GLFW
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 
@@ -73,8 +73,7 @@ object CommandBinds {
                             throw CommandException(command.result("unknownKey"))
                         }
 
-                        module.bind.bind(bindKey)
-                        ModuleClickGui.reloadView()
+                        module.bind.boundKey = bindKey
                         chat(regular(command.result("moduleBound", variable(module.name),
                             variable(module.bind.keyName))))
                     }
@@ -98,7 +97,6 @@ object CommandBinds {
                         }
 
                         module.bind.unbind()
-                        ModuleClickGui.reloadView()
                         chat(regular(command.result("bindRemoved", variable(module.name))))
                     }
                     .build()

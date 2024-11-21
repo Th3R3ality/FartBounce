@@ -5,7 +5,6 @@
     import {addAlteningAccount, browse} from "../../../../integration/rest";
 
     let token = "";
-    let loading = false;
     $: disabled = validateToken(token);
 
     function validateToken(token: string) {
@@ -16,13 +15,12 @@
         if (disabled) {
             return;
         }
-        loading = true;
         await addAlteningAccount(token);
     }
 </script>
 
 <Tab>
     <IconTextInput icon="user" title="Token" bind:value={token}/>
-    <ButtonSetting {disabled} title="Add Account" on:click={addAccount} listenForEnter={true} inset={true} {loading}/>
+    <ButtonSetting {disabled} title="Add Account" on:click={addAccount} listenForEnter={true} inset={true} />
     <ButtonSetting title="Get Account Token" on:click={() => browse("ALTENING_FREE")} secondary={true}/>
 </Tab>

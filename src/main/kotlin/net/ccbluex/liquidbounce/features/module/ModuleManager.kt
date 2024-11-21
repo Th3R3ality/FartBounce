@@ -57,7 +57,6 @@ import net.ccbluex.liquidbounce.features.module.modules.movement.step.ModuleReve
 import net.ccbluex.liquidbounce.features.module.modules.movement.step.ModuleStep
 import net.ccbluex.liquidbounce.features.module.modules.movement.terrainspeed.ModuleTerrainSpeed
 import net.ccbluex.liquidbounce.features.module.modules.player.*
-import net.ccbluex.liquidbounce.features.module.modules.player.antivoid.ModuleAntiVoid
 import net.ccbluex.liquidbounce.features.module.modules.player.autobuff.ModuleAutoBuff
 import net.ccbluex.liquidbounce.features.module.modules.player.autoqueue.ModuleAutoQueue
 import net.ccbluex.liquidbounce.features.module.modules.player.autoshop.ModuleAutoShop
@@ -80,14 +79,9 @@ import net.ccbluex.liquidbounce.features.module.modules.reality.*
 import net.ccbluex.liquidbounce.script.ScriptApiRequired
 import net.ccbluex.liquidbounce.utils.client.mc
 import net.ccbluex.liquidbounce.utils.input.InputBind
-import net.ccbluex.liquidbounce.utils.kotlin.mapArray
-import net.ccbluex.liquidbounce.utils.kotlin.sortedInsert
 import org.lwjgl.glfw.GLFW
 
-/**
- * Should be sorted by Module::name
- */
-private val modules = ArrayList<Module>(256)
+private val modules = mutableListOf<Module>()
 
 /**
  * A fairly simple module manager
@@ -211,7 +205,6 @@ object ModuleManager : Listenable, Iterable<Module> by modules {
             ModuleAntiBot,
             ModuleBetterChat,
             ModuleFriendClicker,
-            ModuleInventoryTracker,
             ModuleNameProtect,
             ModuleNotifier,
             ModuleSpammer,
@@ -364,13 +357,16 @@ object ModuleManager : Listenable, Iterable<Module> by modules {
             builtin += ModuleDebugRecorder
         }
 
-        builtin.forEach(::addModule)
+        builtin.apply {
+            sortBy { it.name }
+            forEach(::addModule)
+        }
     }
 
     private fun addModule(module: Module) {
         module.initConfigurable()
         module.init()
-        modules.sortedInsert(module, Module::name)
+        modules += module
     }
 
     private fun removeModule(module: Module) {
@@ -388,7 +384,7 @@ object ModuleManager : Listenable, Iterable<Module> by modules {
         addModule(module)
     }
 
-    operator fun plusAssign(modules: Iterable<Module>) {
+    operator fun plusAssign(modules: MutableList<Module>) {
         modules.forEach(this::addModule)
     }
 
@@ -396,7 +392,7 @@ object ModuleManager : Listenable, Iterable<Module> by modules {
         removeModule(module)
     }
 
-    operator fun minusAssign(modules: Iterable<Module>) {
+    operator fun minusAssign(modules: MutableList<Module>) {
         modules.forEach(this::removeModule)
     }
 
@@ -428,10 +424,10 @@ object ModuleManager : Listenable, Iterable<Module> by modules {
      */
     @JvmName("getCategories")
     @ScriptApiRequired
-    fun getCategories() = Category.entries.mapArray { it.readableName }
+    fun getCategories() = Category.entries.map { it.readableName }.toTypedArray()
 
     @JvmName("getModules")
-    fun getModules(): Iterable<Module> = modules
+    fun getModules() = modules
 
     @JvmName("getModuleByName")
     @ScriptApiRequired

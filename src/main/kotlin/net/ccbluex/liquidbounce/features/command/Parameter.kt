@@ -43,6 +43,7 @@ class Parameter<T>(
     val vararg: Boolean,
     val verifier: ParameterVerifier<T>?,
     val autocompletionHandler: AutoCompletionHandler?,
+    val useMinecraftAutoCompletion: Boolean,
     var command: Command? = null
 ) {
     private val translationBaseKey: String

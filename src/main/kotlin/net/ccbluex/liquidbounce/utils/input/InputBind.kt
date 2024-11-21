@@ -83,13 +83,6 @@ data class InputBind(
     }
 
     /**
-     * Binds to the given input type and code.
-     */
-    fun bind(key: InputUtil.Key) {
-        this.boundKey = key
-    }
-
-    /**
      * Unbinds the key by setting it to UNKNOWN_KEY.
      */
     fun unbind() {

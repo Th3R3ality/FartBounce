@@ -29,13 +29,12 @@ import net.ccbluex.liquidbounce.authlib.utils.int
 import net.ccbluex.liquidbounce.authlib.utils.string
 import net.ccbluex.liquidbounce.event.events.NotificationEvent
 import net.ccbluex.liquidbounce.features.module.ModuleManager
-import net.ccbluex.liquidbounce.features.module.modules.render.ModuleClickGui
 import net.ccbluex.liquidbounce.utils.client.*
+import net.ccbluex.liquidbounce.utils.kotlin.virtualThread
 import net.minecraft.util.Formatting
 import java.io.Writer
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.concurrent.thread
 
 data class IncludeConfiguration(
     val includeBinds: Boolean = false,
@@ -50,14 +49,6 @@ data class IncludeConfiguration(
 object AutoConfig {
 
     var loadingNow = false
-        set(value) {
-            field = value
-
-            // After completion of loading, sync ClickGUI
-            if (!value) {
-                ModuleClickGui.reloadView()
-            }
-        }
     var includeConfiguration = IncludeConfiguration.DEFAULT
 
     var configsCache: Array<AutoSettings>? = null
@@ -66,7 +57,7 @@ object AutoConfig {
             configsCache = this
         }
 
-    fun loadAutoConfig(autoConfig: AutoSettings) = thread(name = "config-loader") {
+    fun loadAutoConfig(autoConfig: AutoSettings) = virtualThread(name = "config-loader") {
         loadingNow = true
         runCatching {
             ClientApi.requestSettingsScript(autoConfig.settingId).apply {

@@ -24,7 +24,6 @@ import net.ccbluex.liquidbounce.features.command.builder.CommandBuilder
 import net.ccbluex.liquidbounce.features.command.builder.ParameterBuilder
 import net.ccbluex.liquidbounce.features.command.builder.moduleParameter
 import net.ccbluex.liquidbounce.features.module.ModuleManager
-import net.ccbluex.liquidbounce.features.module.modules.render.ModuleClickGui
 import net.ccbluex.liquidbounce.utils.client.*
 import net.ccbluex.liquidbounce.utils.input.keyList
 import net.ccbluex.liquidbounce.utils.input.mouseList
@@ -59,14 +58,12 @@ object CommandBind {
 
                 if (keyName.equals("none", true)) {
                     module.bind.unbind()
-                    ModuleClickGui.reloadView()
                     chat(regular(command.result("moduleUnbound", variable(module.name))))
                     return@handler
                 }
 
                 runCatching {
                     module.bind.bind(keyName)
-                    ModuleClickGui.reloadView()
                 }.onSuccess {
                     chat(regular(command.result("moduleBound", variable(module.name), variable(module.bind.keyName))))
                 }.onFailure {

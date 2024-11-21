@@ -79,11 +79,15 @@ fun moduleParameter(name: String = "module", validator: (Module) -> Boolean = { 
         }
 }
 
-fun playerParameter(name: String = "playerName"): ParameterBuilder<String> {
+fun playerParameter(name: String = "player"): ParameterBuilder<String> {
     return ParameterBuilder
         .begin<String>(name)
         .verifiedBy(ParameterBuilder.STRING_VALIDATOR)
-        .useMinecraftAutoCompletion()
+        .autocompletedWith { _, _ ->
+            mc.networkHandler?.playerList?.map { playerListEntry ->
+                playerListEntry.profile.name
+            } ?: emptyList()
+        }
 }
 
 
